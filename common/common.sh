@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[[ "$DEBUG" == 'true' ]] && set -x
+
 set -o errexit
 
 # test options
@@ -12,7 +14,7 @@ TF_CONFIG_DIR="${WORKSPACE}/.tf"
 TF_STACK_PROFILE="${TF_CONFIG_DIR}/stack.env"
 
 # import tf profile that created by devstack into current context
-[ -e "$TF_STACK_PROFILE" ] && source "$TF_DEVENV_PROFILE"
+[ -e "$TF_STACK_PROFILE" ] && source "$TF_STACK_PROFILE"
 
 # determined variables
 DISTRO=$(cat /etc/*release | egrep '^ID=' | awk -F= '{print $2}' | tr -d \")

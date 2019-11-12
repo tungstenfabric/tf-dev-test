@@ -31,3 +31,15 @@ function run_container() {
     $opts $image
   return $?
 }
+
+function set_ssh_keys() {
+  [ ! -d ~/.ssh ] && mkdir ~/.ssh && chmod 0700 ~/.ssh
+  [ ! -f ~/.ssh/id_rsa ] && ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -N ''
+  [ ! -f ~/.ssh/authorized_keys ] && touch ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys
+  grep "$(<~/.ssh/id_rsa.pub)" ~/.ssh/authorized_keys -q || cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+  cat <<EOF > ~/.ssh/config
+Host *
+StrictHostKeyChecking no
+UserKnownHostsFile=/dev/null
+EOF
+}
