@@ -6,7 +6,7 @@ set -o errexit
 
 # test options
 export TF_TEST_NAME=${TF_TEST_NAME:-"smoke-test"}
-export TF_TEST_IMAGE=${TF_TEST_IMAGE:-"${TF_TEST_NAME}:latest"}
+export TF_TEST_IMAGE=${TF_TEST_IMAGE:-}
 
 # working environment
 WORKSPACE=${WORKSPACE:-$(pwd)}
