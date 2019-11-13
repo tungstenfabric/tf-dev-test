@@ -7,7 +7,7 @@ source "$my_dir/../common/functions.sh"
 
 # 
 TF_TEST_NAME="contrail-test"
-TF_TEST_IMAGE="${TF_TEST_NAME}-test:$CONTRAIL_CONTAINER_TAG"
+TF_TEST_IMAGE="${TF_TEST_NAME}-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
 
 TF_TEST_PROJECT="Juniper/$TF_TEST_NAME.git"
 TF_TEST_TARGET=${TF_TEST_TARGET:-'ci_k8s_sanity'}
@@ -20,7 +20,9 @@ echo "[$TF_TEST_NAME]"
 
 # prerequisites
 # (expected pip is already installed)
-pip install docker-py
+# conflict with ansible-deployer which setups docker (might be deps for docker-compose)
+#pip install docker-py
+
 
 # prepare ssh keys for local connect
 set_ssh_keys

@@ -45,13 +45,21 @@ instances:
 {%- endif %}
 
 global_configuration:
-  CONTAINER_REGISTRY: $CONTAINER_REGISTRY
+  CONTAINER_REGISTRY: "{{ CONTAINER_REGISTRY }}"
   REGISTRY_PRIVATE_INSECURE: True
+
 contrail_configuration:
-  CONTRAIL_CONTAINER_TAG: $CONTRAIL_CONTAINER_TAG
-  CONFIG_DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "2"
-  DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "2"
-  JVM_EXTRA_OPTS: "-Xms1g -Xmx2g"
-  VROUTER_ENCRYPTION: FALSE
+  CONTRAIL_CONTAINER_TAG: "{{ CONTRAIL_CONTAINER_TAG }}"
   LOG_LEVEL: SYS_DEBUG
-  CLOUD_ORCHESTRATOR: kubernetes
+  KUBERNETES_PUBLIC_FIP_POOL:
+     domain: default-domain
+     name: __fip_pool_public__
+     network: __public__
+     project: k8s-default
+
+deployment:
+    orchestrator: kubernetes
+
+test_configuration:
+    image_web_server: {{ image_web_server }}
+    use_project_scoped_token: True

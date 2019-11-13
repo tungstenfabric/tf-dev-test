@@ -46,14 +46,10 @@ global_configuration:
   REGISTRY_PRIVATE_INSECURE: True
 
 contrail_configuration:
-  CONTRAIL_CONTAINER_TAG: $CONTRAIL_CONTAINER_TAG
-  CONFIG_DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "2"
-  DATABASE_NODEMGR__DEFAULTS__minimum_diskGB: "2"
-  JVM_EXTRA_OPTS: "-Xms1g -Xmx2g"
-  VROUTER_ENCRYPTION: FALSE
   LOG_LEVEL: SYS_DEBUG
   CLOUD_ORCHESTRATOR: openstack
-  OPENSTACK_VERSION: $OPENSTACK_VERSION
+  CONTRAIL_CONTAINER_TAG: {{ CONTRAIL_CONTAINER_TAG }}
+  OPENSTACK_VERSION: {{ OPENSTACK_VERSION }}
   AUTH_MODE: keystone
   KEYSTONE_AUTH_URL_VERSION: /v3
 
@@ -63,6 +59,19 @@ kolla_config:
     enable_ironic: no
     enable_swift: no
     enable_barbican: no
+    enable_ironic_notifications: no
     nova_compute_virt_type: qemu
   kolla_passwords:
     keystone_admin_password: contrail123
+
+orchestrator_configuration:
+  keystone:
+    version: v3
+    password: contrail123
+
+deployment:
+    orchestrator: openstack
+
+test_configuration:
+    image_web_server: {{ image_web_server }}
+    use_project_scoped_token: True
