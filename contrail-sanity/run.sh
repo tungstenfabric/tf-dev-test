@@ -7,7 +7,10 @@ source "$my_dir/../common/functions.sh"
 
 # 
 TF_TEST_NAME="contrail-test"
-TF_TEST_IMAGE="${TF_TEST_NAME}-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
+if [ -z "$TF_TEST_IMAGE" ] ; then
+    TF_TEST_IMAGE="${TF_TEST_NAME}-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
+    [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
+fi
 
 TF_TEST_PROJECT="Juniper/$TF_TEST_NAME.git"
 TF_TEST_TARGET=${TF_TEST_TARGET:-'ci_k8s_sanity'}
