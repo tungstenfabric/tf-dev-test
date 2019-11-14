@@ -58,5 +58,11 @@ time EXTRA_RUN_TEST_ARGS="-t" sudo -E ${TF_TEST_NAME}/testrunner.sh run \
 popd
 
 # check for failures
-[ x\"$(grep testsuite /root/contrail-test-runs/*/reports/TESTS-TestSuites.xml  | grep -o  'failures=\\S\\+' | uniq)\" = x'failures=\"0\"' ]
-exit $?
+
+if [[ $(grep testsuite /root/contrail-test-runs/*/reports/TESTS-TestSuites.xml  | grep -o 'failures="[0-9]\+"' | sort | uniq) == x'failures=\"0\"' ]] ; then
+    echo "run test finished successfully"
+    exit 0
+else
+    echo "ERROR: there were failures during the test"
+    exit 1
+fi
