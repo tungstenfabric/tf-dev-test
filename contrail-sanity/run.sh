@@ -47,15 +47,14 @@ echo "prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
 echo "TF test input:"
 cat ./contrail_test_input.yaml
 
-echo "run tests"
+echo "run tests..."
 
-time EXTRA_RUN_TEST_ARGS="-t" HOME=$WORKSPACE sudo -E ${TF_TEST_NAME}/testrunner.sh run \
+if time EXTRA_RUN_TEST_ARGS="-t" HOME=$WORKSPACE sudo -E ${TF_TEST_NAME}/testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     -f $TF_TEST_TARGET \
-    $TF_TEST_IMAGE > /dev/null
+    $TF_TEST_IMAGE > /dev/null ; then
 
-if [[ $? == 0 ]] ; then
     echo "run test finished successfully"
     exit 0
 else
