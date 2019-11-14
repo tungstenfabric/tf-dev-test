@@ -20,7 +20,7 @@ TF_TEST_TARGET=${TF_TEST_TARGET:-'ci_k8s_sanity'}
 TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.$ORCHESTRATOR.yaml.j2"}
 
 
-pushd $WORKSPACE
+cd $WORKSPACE
 
 echo 
 echo "[$TF_TEST_NAME]"
@@ -49,20 +49,17 @@ cat ./contrail_test_input.yaml
 
 echo "run tests"
 
-time EXTRA_RUN_TEST_ARGS="-t" sudo -E ${TF_TEST_NAME}/testrunner.sh run \
+time EXTRA_RUN_TEST_ARGS="-t" HOME=$WORKSPACE sudo -E ${TF_TEST_NAME}/testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     -f $TF_TEST_TARGET \
-    $TF_TEST_IMAGE
+    $TF_TEST_IMAGE > /dev/null
 
-popd
-
-# check for failures
-
-if [[ $(grep testsuite /root/contrail-test-runs/*/reports/TESTS-TestSuites.xml  | grep -o 'failures="[0-9]\+"' | sort | uniq) == x'failures=\"0\"' ]] ; then
+if [[ $? == 0 ]] ; then
     echo "run test finished successfully"
     exit 0
 else
-    echo "ERROR: there were failures during the test"
+    echo "ERROR: there were failures during the test."
+    echo "       See detailed logs in ${WORKSPACE}/contrail-test-runs"
     exit 1
 fi
