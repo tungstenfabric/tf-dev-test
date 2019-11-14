@@ -5,6 +5,9 @@ my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
 source "$my_dir/../common/functions.sh"
 
+export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
+export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"pnexus.sytes.net/repository/"}
+
 # 
 TF_TEST_NAME="contrail-test"
 if [ -z "$TF_TEST_IMAGE" ] ; then
@@ -12,12 +15,10 @@ if [ -z "$TF_TEST_IMAGE" ] ; then
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
 fi
 
-
 TF_TEST_PROJECT="Juniper/$TF_TEST_NAME.git"
 TF_TEST_TARGET=${TF_TEST_TARGET:-'ci_k8s_sanity'}
 TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.$ORCHESTRATOR.yaml.j2"}
 
-export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
 
 pushd $WORKSPACE
 
