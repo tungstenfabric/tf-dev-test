@@ -10,7 +10,7 @@ export TF_TEST_IMAGE=${TF_TEST_IMAGE:-}
 
 # working environment
 WORKSPACE=${WORKSPACE:-$(pwd)}
-TF_CONFIG_DIR="${WORKSPACE}/.tf"
+TF_CONFIG_DIR=${TF_CONFIG_DIR:-"${HOME}/.tf"}
 TF_STACK_PROFILE="${TF_CONFIG_DIR}/stack.env"
 
 # import tf profile that created by devstack into current context
