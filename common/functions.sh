@@ -24,7 +24,7 @@ function run_container() {
   local image$2
   shift 2
   local opts=$@
-  docker run --name $name -it --rm --network host --privileged \
+  sudo docker run --name $name -it --rm --network host --privileged \
     -e WORKSPACE=$WORKSPACE \
     -v $WORKSPACE:$WORKSPACE \
     -v "/var/run:/var/run" \
@@ -32,7 +32,8 @@ function run_container() {
   return $?
 }
 
-function set_ssh_keys() {
+function set_ssh_keys_current_user() {
+  echo "set ssh options for '$whoami' user"
   [ ! -d ~/.ssh ] && mkdir ~/.ssh && chmod 0700 ~/.ssh
   [ ! -f ~/.ssh/id_rsa ] && ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -N ''
   [ ! -f ~/.ssh/authorized_keys ] && touch ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys
@@ -42,4 +43,13 @@ Host *
 StrictHostKeyChecking no
 UserKnownHostsFile=/dev/null
 EOF
+chmod 600 ~/.ssh/config
+}
+
+function set_ssh_keys() {
+  # set for current user
+  set_ssh_keys_current_user
+  # set for root if current is not root
+  # contrail-test use root for now
+  sudo bash -c "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"
 }

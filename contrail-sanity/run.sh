@@ -33,8 +33,9 @@ echo "[$TF_TEST_NAME]"
 # Uninstall docker-compose and packages it uses to avoid 
 # conflicts with other projects (like tf-test, tf-dev-env)
 # and reinstall them via deps of docker-compose
-pip uninstall -y requests docker-compose urllib3 chardet docker docker-py
-pip install jinja2 'ansible==2.7.11' 'docker-compose===1.24.1'
+sudo pip uninstall -y requests docker-compose urllib3 chardet docker docker-py
+# WARN: docker-compose is to be installed first becuase it need a specifi PyYAML
+sudo pip install 'docker-compose===1.24.1' jinja2 'ansible==2.7.11'
 
 
 # prepare ssh keys for local connect
