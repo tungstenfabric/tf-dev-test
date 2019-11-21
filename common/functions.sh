@@ -33,7 +33,7 @@ function run_container() {
 }
 
 function set_ssh_keys_current_user() {
-  echo "set ssh options for '$whoami' user"
+  echo "set ssh options for '$(whoami)' user"
   [ ! -d ~/.ssh ] && mkdir ~/.ssh && chmod 0700 ~/.ssh
   [ ! -f ~/.ssh/id_rsa ] && ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -N ''
   [ ! -f ~/.ssh/authorized_keys ] && touch ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys
