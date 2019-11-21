@@ -33,7 +33,7 @@ function run_container() {
 }
 
 function set_ssh_keys_current_user() {
-  echo "set ssh options for '$(whoami)' user"
+  echo "set ssh options for $(whoami) user"
   [ ! -d ~/.ssh ] && mkdir ~/.ssh && chmod 0700 ~/.ssh
   [ ! -f ~/.ssh/id_rsa ] && ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -N ''
   [ ! -f ~/.ssh/authorized_keys ] && touch ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys
@@ -48,7 +48,7 @@ chmod 600 ~/.ssh/config
 
 function set_ssh_keys() {
   local user=${1:-}
-  if [[ -z "$user" || "$user" == "$(whomai)" ]] ; then
+  if [[ -z "$user" || "$user" == "$(whoami)" ]] ; then
     # set for current user
     set_ssh_keys_current_user
   elif [[ "$user" == 'root' ]] ; then
