@@ -30,6 +30,12 @@ echo "[$TF_TEST_NAME]"
 # conflict with ansible-deployer which setups docker (might be deps for docker-compose)
 #pip install docker-py
 
+# Uninstall docker-compose and packages it uses to avoid 
+# conflicts with other projects (like tf-test, tf-dev-env)
+# and reinstall them via deps of docker-compose
+pip uninstall -y requests docker-compose urllib3 chardet docker docker-py
+pip install jinja2 'ansible==2.7.11' 'docker-compose===1.24.1'
+
 
 # prepare ssh keys for local connect
 set_ssh_keys
