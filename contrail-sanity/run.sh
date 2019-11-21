@@ -19,6 +19,7 @@ TF_TEST_PROJECT="Juniper/$TF_TEST_NAME.git"
 TF_TEST_TARGET=${TF_TEST_TARGET:-'ci_k8s_sanity'}
 TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.$ORCHESTRATOR.yaml.j2"}
 
+SSH_USER=${SSH_USER:-$(whoami)}
 
 cd $WORKSPACE
 

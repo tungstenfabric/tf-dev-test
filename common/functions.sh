@@ -47,9 +47,15 @@ chmod 600 ~/.ssh/config
 }
 
 function set_ssh_keys() {
-  # set for current user
-  set_ssh_keys_current_user
-  # set for root if current is not root
-  # contrail-test use root for now
-  sudo bash -c "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"
+  local user=${1:-}
+  if [[ -z "$user" || "$user" == "$(whomai)" ]] ; then
+    # set for current user
+    set_ssh_keys_current_user
+  elif [[ "$user" == 'root' ]] ; then
+    # set for root if current is not root
+    # contrail-test use root for now
+    sudo bash -c "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"
+  else
+    sudo runuser -u $user "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"
+  fi
 }
