@@ -40,7 +40,7 @@ sudo pip install 'docker-compose===1.24.1' jinja2 'ansible==2.7.11'
 
 
 # prepare ssh keys for local connect
-set_ssh_keys
+set_ssh_keys $SSH_USER
 
 # get test project
 echo get $TF_TEST_NAME project
