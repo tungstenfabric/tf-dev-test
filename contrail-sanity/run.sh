@@ -55,7 +55,7 @@ cat ./contrail_test_input.yaml
 
 echo "run tests..."
 
-if time EXTRA_RUN_TEST_ARGS="-t" HOME=$WORKSPACE sudo -E ${TF_TEST_NAME}/testrunner.sh run \
+if EXTRA_RUN_TEST_ARGS="-t" HOME=$WORKSPACE sudo -E ${TF_TEST_NAME}/testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     -f $TF_TEST_TARGET \
