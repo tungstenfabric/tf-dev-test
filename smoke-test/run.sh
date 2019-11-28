@@ -2,8 +2,8 @@
 
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
-source "$my_dir/common/common.sh"
-source "$my_dir/common/functions.sh"
+source "$my_dir/../common/common.sh"
+source "$my_dir/../common/functions.sh"
 
 pushd $WORKSPACE
 
@@ -18,6 +18,6 @@ nodes="$(echo ${CONTROLLER_NODES},${AGENT_NODES} | tr ',' '\n' | sort | uniq)"
 # run_container $TF_TEST_NAME $TF_TEST_IMAGE
 res=$?
 
-popd
-
-exit $res
+if [[ "$ORCHESTRATOR" == "openstack" ]]; then
+  ./test_openstack_vm.sh
+fi
