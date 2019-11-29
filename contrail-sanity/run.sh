@@ -47,7 +47,7 @@ cat ./contrail_test_input.yaml
 
 echo "run tests..."
 
-if EXTRA_RUN_TEST_ARGS="-t" HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh run \
+if HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     -f $TF_TEST_TARGET \
