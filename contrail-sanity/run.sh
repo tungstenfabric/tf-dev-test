@@ -26,18 +26,8 @@ cd $WORKSPACE
 echo 
 echo "[$TF_TEST_NAME]"
 
-# prerequisites
-# (expected pip is already installed)
-# conflict with ansible-deployer which setups docker (might be deps for docker-compose)
-#pip install docker-py
-
-# Uninstall docker-compose and packages it uses to avoid 
-# conflicts with other projects (like tf-test, tf-dev-env)
-# and reinstall them via deps of docker-compose
-sudo pip uninstall -y requests docker-compose urllib3 chardet docker docker-py
-# WARN: docker-compose is to be installed first becuase it need a specifi PyYAML
-sudo pip install 'docker-compose===1.24.1' jinja2 'ansible==2.7.11'
-
+curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
+sudo pip install jinja2
 
 # prepare ssh keys for local connect
 set_ssh_keys $SSH_USER
@@ -57,7 +47,7 @@ cat ./contrail_test_input.yaml
 
 echo "run tests..."
 
-if EXTRA_RUN_TEST_ARGS="-t" HOME=$WORKSPACE sudo -E ${TF_TEST_NAME}/testrunner.sh run \
+if EXTRA_RUN_TEST_ARGS="-t" HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     -f $TF_TEST_TARGET \
