@@ -45,13 +45,16 @@ echo "prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
 echo "TF test input:"
 cat ./contrail_test_input.yaml
 
+echo "Pull image..."
+HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh pull $TF_TEST_IMAGE
+
 echo "run tests..."
 
 if HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     -f $TF_TEST_TARGET \
-    $TF_TEST_IMAGE > /dev/null ; then
+    $TF_TEST_IMAGE ; then
 
     echo "run test finished successfully"
     exit 0
