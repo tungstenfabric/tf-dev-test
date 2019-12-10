@@ -45,6 +45,10 @@ echo "prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
 echo "TF test input:"
 cat ./contrail_test_input.yaml
 
+# hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf
+# TODO: fix this in contrail-test
+sudo chmod 644 /etc/kubernetes/admin.conf || /bin/true
+
 echo "Pull image..."
 HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh pull $TF_TEST_IMAGE
 
