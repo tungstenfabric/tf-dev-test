@@ -59,16 +59,20 @@ HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh pull $TF_TEST_IMAGE
 
 echo "run tests..."
 
+# NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
 if HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     -f $TF_TEST_TARGET \
     $TF_TEST_IMAGE ; then
 
-    echo "run test finished successfully"
-    exit 0
+    echo "WOW! testrunner exited with code 0!"
 else
-    echo "ERROR: there were failures during the test."
-    echo "       See detailed logs in ${WORKSPACE}/contrail-test-runs"
-    exit 1
+    # NOTE: same hack as in zuul for now
+    test_failures="$(grep testsuite /root/contrail-test-runs/*/reports/TESTS-TestSuites.xml  | grep -o  'failures=\\S\\+' | uniq)"
+    if [[ x"$test_failures" != x'failures=\"0\"' ]]; then
+        echo "ERROR: there were failures during the test."
+        echo "       See detailed logs in ${WORKSPACE}/contrail-test-runs"
+        exit 1
+    fi
 fi
