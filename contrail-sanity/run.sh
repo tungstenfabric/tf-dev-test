@@ -69,7 +69,7 @@ if HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh run \
     echo "WOW! testrunner exited with code 0!"
 else
     # NOTE: same hack as in zuul for now
-    test_failures="$(grep testsuite /root/contrail-test-runs/*/reports/TESTS-TestSuites.xml  | grep -o  'failures=\\S\\+' | uniq)"
+    test_failures="$(grep testsuite ${WORKSPACE}/contrail-test-runs/*/reports/TESTS-TestSuites.xml  | grep -o  'failures=\\S\\+' | uniq)"
     if [[ x"$test_failures" != x'failures=\"0\"' ]]; then
         echo "ERROR: there were failures during the test."
         echo "       See detailed logs in ${WORKSPACE}/contrail-test-runs"
