@@ -53,17 +53,6 @@ contrail_configuration:
   AUTH_MODE: keystone
   KEYSTONE_AUTH_URL_VERSION: /v3
 
-kolla_config:
-  kolla_globals:
-    enable_haproxy: no
-    enable_ironic: no
-    enable_swift: no
-    enable_barbican: no
-    enable_ironic_notifications: no
-    nova_compute_virt_type: qemu
-  kolla_passwords:
-    keystone_admin_password: contrail123
-
 orchestrator_configuration:
   keystone:
     version: v3
@@ -71,8 +60,16 @@ orchestrator_configuration:
 
 deployment:
     orchestrator: openstack
+{%- if DEPLOYER == 'ansible' %}
     deployer: contrail-ansible-deployer
+{%- else %}
+    deployer: {{ DEPLOYER }}
+{%- endif %}
 
 test_configuration:
     image_web_server: {{ IMAGE_WEB_SERVER }}
     use_project_scoped_token: True
+{%- if DEPLOYER == 'helm' %}
+    auth_port: 80
+    auth_url: http://keystone.openstack.svc.cluster.local:80/v3
+{%- endif %}

@@ -59,7 +59,11 @@ contrail_configuration:
 
 deployment:
     orchestrator: kubernetes
+{%- if DEPLOYER == 'ansible' %}
     deployer: contrail-ansible-deployer
+{%- else %}
+    deployer: {{ DEPLOYER }}
+{%- endif %}
 
 test_configuration:
     image_web_server: {{ IMAGE_WEB_SERVER }}
