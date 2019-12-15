@@ -42,7 +42,7 @@ instances:
 {%- endif %}
 
 global_configuration:
-  CONTAINER_REGISTRY: $CONTAINER_REGISTRY
+  CONTAINER_REGISTRY: {{ CONTAINER_REGISTRY }}
   REGISTRY_PRIVATE_INSECURE: True
 
 contrail_configuration:

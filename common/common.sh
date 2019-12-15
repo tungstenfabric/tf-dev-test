@@ -14,7 +14,9 @@ TF_CONFIG_DIR=${TF_CONFIG_DIR:-"${HOME}/.tf"}
 TF_STACK_PROFILE="${TF_CONFIG_DIR}/stack.env"
 
 # import tf profile that created by devstack into current context
+set -o allexport
 [ -e "$TF_STACK_PROFILE" ] && source "$TF_STACK_PROFILE"
+set +o allexport
 
 # determined variables
 DISTRO=$(cat /etc/*release | egrep '^ID=' | awk -F= '{print $2}' | tr -d \")
