@@ -57,6 +57,9 @@ orchestrator_configuration:
   keystone:
     version: v3
     password: contrail123
+{%- if DEPLOYER == 'juju' %}
+    domain: admin_domain
+{%- endif %}
 
 deployment:
     orchestrator: openstack
