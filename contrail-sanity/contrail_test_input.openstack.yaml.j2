@@ -56,9 +56,9 @@ contrail_configuration:
 orchestrator_configuration:
   keystone:
     version: v3
-    password: contrail123
-{%- if DEPLOYER == 'juju' %}
-    domain: admin_domain
+    password: {{ AUTH_PASSWORD }}
+{%- if AUTH_DOMAIN %}
+    domain: {{ AUTH_DOMAIN }}
 {%- endif %}
 
 deployment:
@@ -72,7 +72,9 @@ deployment:
 test_configuration:
     image_web_server: {{ IMAGE_WEB_SERVER }}
     use_project_scoped_token: True
-{%- if DEPLOYER == 'helm' %}
-    auth_port: 80
-    auth_url: http://keystone.openstack.svc.cluster.local:80/v3
+{%- if AUTH_PORT %}
+    auth_port: {{ AUTH_PORT }}
+{%- endif %}
+{%- if AUTH_URL %}
+    auth_url: {{ AUTH_URL }}
 {%- endif %}
