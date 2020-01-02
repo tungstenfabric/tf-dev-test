@@ -37,10 +37,16 @@ sudo pip install jinja2
 # prepare ssh keys for local connect
 set_ssh_keys $SSH_USER
 
-# get test project
-echo get $TF_TEST_NAME project
-[ -d ./$TF_TEST_NAME ] &&  rm -rf ./$TF_TEST_NAME
-git clone --depth 1 --single-branch https://github.com/$TF_TEST_PROJECT $TF_TEST_NAME
+# temporary
+set +x
+
+# get testrunner.sh project
+echo "get testrunner.sh"
+sudo docker pull $TF_TEST_IMAGE
+tmp_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
+sudo docker create --name $tmp_name $TF_TEST_IMAGE
+sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
+sudo docker rm $tmp_name
 
 # run tests:
 
@@ -54,13 +60,10 @@ cat ./contrail_test_input.yaml
 # TODO: fix this in contrail-test
 sudo chmod 644 /etc/kubernetes/admin.conf || /bin/true
 
-echo "Pull image..."
-HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh pull $TF_TEST_IMAGE
-
 echo "run tests..."
 
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
-if HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh run \
+if HOME=$WORKSPACE ./testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     -f $TF_TEST_TARGET \
@@ -68,6 +71,8 @@ if HOME=$WORKSPACE ${TF_TEST_NAME}/testrunner.sh run \
 
     echo "WOW! testrunner exited with code 0!"
 else
+    ls -la || /bin/true
+    ls -la ${WORKSPACE}/contrail-test-runs/ || /bin/true
     # NOTE: same hack as in zuul for now
     test_failures="$(grep testsuite ${WORKSPACE}/contrail-test-runs/*/reports/TESTS-TestSuites.xml | grep -o  'failures=\S\+' | uniq)"
     if [[ x"$test_failures" != x'failures="0"' ]]; then
