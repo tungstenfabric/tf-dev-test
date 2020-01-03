@@ -37,9 +37,6 @@ sudo pip install jinja2
 # prepare ssh keys for local connect
 set_ssh_keys $SSH_USER
 
-# temporary
-set +x
-
 # get testrunner.sh project
 echo "get testrunner.sh"
 sudo docker pull $TF_TEST_IMAGE
@@ -71,8 +68,6 @@ if HOME=$WORKSPACE ./testrunner.sh run \
 
     echo "WOW! testrunner exited with code 0!"
 else
-    ls -la || /bin/true
-    ls -la ${WORKSPACE}/contrail-test-runs/ || /bin/true
     # NOTE: same hack as in zuul for now
     test_failures="$(grep testsuite ${WORKSPACE}/contrail-test-runs/*/reports/TESTS-TestSuites.xml | grep -o  'failures=\S\+' | uniq)"
     if [[ x"$test_failures" != x'failures="0"' ]]; then
