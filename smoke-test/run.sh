@@ -19,5 +19,5 @@ nodes="$(echo ${CONTROLLER_NODES},${AGENT_NODES} | tr ',' '\n' | sort | uniq)"
 res=$?
 
 if [[ "$ORCHESTRATOR" == "openstack" ]]; then
-  ./test_openstack_vm.sh
+  ${my_dir}/test_openstack_vm.sh
 fi
