@@ -55,7 +55,13 @@ cat ./contrail_test_input.yaml
 
 # hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf
 # TODO: fix this in contrail-test
-sudo chmod 644 /etc/kubernetes/admin.conf || /bin/true
+if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]] ; then
+  if [[ ! -f /etc/kubernetes/admin.conf && -f ~/.kube/config ]] ; then
+    sudo mkdir -p /etc/kubernetes/
+    sudo cp ~/.kube/config /etc/kubernetes/admin.conf
+  fi
+  sudo chmod 644 /etc/kubernetes/admin.conf || /bin/true
+fi
 
 echo "run tests..."
 
