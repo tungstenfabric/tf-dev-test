@@ -81,3 +81,6 @@ test_configuration:
 {%- if AUTH_URL %}
     auth_url: {{ AUTH_URL }}
 {%- endif %}
+{%- if AUTH_DOMAIN %}
+    test_domain: {{ AUTH_DOMAIN }}
+{%- endif %}
