@@ -60,6 +60,9 @@ orchestrator_configuration:
 {%- if AUTH_DOMAIN %}
     domain: {{ AUTH_DOMAIN }}
 {%- endif %}
+{%- if AUTH_REGION %}
+    region: {{ AUTH_REGION }}
+{%- endif %}
 
 deployment:
     orchestrator: openstack
