@@ -32,7 +32,7 @@ echo
 echo "[$TF_TEST_NAME]"
 
 curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
-sudo pip install jinja2
+sudo pip install jinja2 future
 
 # prepare ssh keys for local connect
 set_ssh_keys $SSH_USER
