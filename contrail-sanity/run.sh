@@ -17,7 +17,12 @@ if [ -z "$TF_TEST_IMAGE" ] ; then
 fi
 
 TF_TEST_PROJECT="Juniper/$TF_TEST_NAME.git"
-declare -A default_targets=(['kubernetes']='ci_k8s_sanity' ['openstack']='ci_sanity')
+
+k8s_target='ci_k8s_sanity'
+if [[ "$DEPLOYER" == 'openshift' ]] ; then
+  k8s_target='ci_openshift'
+fi
+declare -A default_targets=(['kubernetes']="$k8s_target" ['openstack']='ci_sanity')
 TF_TEST_TARGET=${TF_TEST_TARGET:-${default_targets[$ORCHESTRATOR]}}
 if [[ -z "$TF_TEST_TARGET" ]]; then
   echo "ERROR: please provide either ORCHESTRATOR or TF_TEST_TARGET"
