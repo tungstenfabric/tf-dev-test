@@ -10,10 +10,21 @@ pushd $WORKSPACE
 echo 
 echo "[$TF_TEST_NAME]"
 
-nodes="$(echo ${CONTROLLER_NODES},${AGENT_NODES} | tr ',' '\n' | sort | uniq)"
-
 # TODO: to be implemented
-#sudo contrail-status
+
+printf '%*s\n' 120 | tr ' ' '='
+nodes="$(echo ${CONTROLLER_NODES},${AGENT_NODES} | tr ',' '\n' | sort | uniq)"
+echo "NODES: $nodes"
+
+printf '%*s\n' 120 | tr ' ' '='
+sudo contrail-status
+printf '%*s\n' 120 | tr ' ' '='
+sudo docker ps -a
+printf '%*s\n' 120 | tr ' ' '='
+sudo docker images
+printf '%*s\n' 120 | tr ' ' '*'
+ps ax -H
+printf '%*s\n' 120 | tr ' ' '*'
 
 # run_container $TF_TEST_NAME $TF_TEST_IMAGE
 res=$?
