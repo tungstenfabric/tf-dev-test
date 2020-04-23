@@ -26,9 +26,8 @@ printf '%*s\n' 120 | tr ' ' '*'
 ps ax -H
 printf '%*s\n' 120 | tr ' ' '*'
 
-# run_container $TF_TEST_NAME $TF_TEST_IMAGE
-res=$?
-
 if [[ "$ORCHESTRATOR" == "openstack" ]]; then
   ${my_dir}/test_openstack_vm.sh
 fi
+
+${my_dir}/test_webui.sh
