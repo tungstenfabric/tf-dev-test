@@ -23,6 +23,7 @@ instances:
       webui:
       openstack:
 {%- if node in AGENT_NODES %}
+      vrouter:
       openstack_compute:
 {%- endif %}
 {%- endfor %}
