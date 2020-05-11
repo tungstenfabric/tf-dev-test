@@ -10,6 +10,8 @@ TEST_IMAGE_URL=${TEST_IMAGE_URL:-'http://download.cirros-cloud.net/0.3.4/cirros-
 
 OVERCLOUD_TLS_OPTS=${OVERCLOUD_TLS_OPTS:-}
 
+SSH_OPTIONS="-T -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+
 TEST_INSTANCE_NAME=tf-devstack-testvm
 function cleanup() {
   openstack server delete tf-devstack-testvm --wait || :
@@ -56,14 +58,14 @@ openstack server create --availability-zone "nova::$first_hypervisor_name" --ima
 instance_ip=$(openstack server show $TEST_INSTANCE_NAME | awk '/addresses/{print $4}' | cut -d '=' -f 2 | sed 's/,$//g')
 	
 # on the hypervisor where instance run
-if_name=$(ssh $first_hypervisor_ip sudo vif --list | grep -B 1 $instance_ip | head -1 | awk '{print $3}' | sed 's/\r//g')
-ssh $first_hypervisor_ip curl -s "http://$first_hypervisor_ip:8085/Snh_ItfReq?name=$if_name"
-linklocal_ip=$(ssh $first_hypervisor_ip curl -s "http://$first_hypervisor_ip:8085/Snh_ItfReq?name=$if_name" | sed 's/^.*<mdata_ip_addr.*>\([0-9\.]*\)<.mdata_ip_addr>.*$/\1/')
+if_name=$(ssh $SSH_OPTIONS $first_hypervisor_ip sudo vif --list | grep -B 1 $instance_ip | head -1 | awk '{print $3}' | sed 's/\r//g')
+ssh $SSH_OPTIONS $first_hypervisor_ip curl -s "http://$first_hypervisor_ip:8085/Snh_ItfReq?name=$if_name"
+linklocal_ip=$(ssh $SSH_OPTIONS $first_hypervisor_ip curl -s "http://$first_hypervisor_ip:8085/Snh_ItfReq?name=$if_name" | sed 's/^.*<mdata_ip_addr.*>\([0-9\.]*\)<.mdata_ip_addr>.*$/\1/')
 
 res=1
 msg="ERROR: failed to execute ssh $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip"
 for i in {1..5} ; do
-  if ssh $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip ; then
+  if ssh $SSH_OPTIONS $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip ; then
     msg="INFO: suceeded ssh $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip"
     res=0
     break
@@ -72,8 +74,8 @@ done
 echo $msg
 
 # Enable after metadata is working
-#ssh $first_hypervisor_ip sudo yum install -y sshpass || ssh $first_hypervisor_ip sudo apt-get install sshpass
-#ssh $first_hypervisor_ip sshpass -p 'cubswin:)'  ssh cirros@$linklocal_ip curl --connect-timeout 5 http://169.254.169.254/2009-04-04/instance-id
+#ssh $SSH_OPTIONS $first_hypervisor_ip sudo yum install -y sshpass || ssh $first_hypervisor_ip sudo apt-get install sshpass
+#ssh $SSH_OPTIONS $first_hypervisor_ip sshpass -p 'cubswin:)'  ssh cirros@$linklocal_ip curl --connect-timeout 5 http://169.254.169.254/2009-04-04/instance-id
 # Tear down
 cleanup
 
