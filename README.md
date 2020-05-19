@@ -1,10 +1,10 @@
-# tf-test
+# tf-dev-test
 
-tf-test is a tool for testing of Tungsten Fabric deployments by means of various test suites and methods.
+tf-dev-test is a tool for testing of Tungsten Fabric deployments by means of various test suites and methods.
 
 Supported test suites are:
-- [smoke](https://github.com/tungstenfabric/tf-test/tree/master/smoke-test)
-- [contrail-sanity](https://github.com/tungstenfabric/tf-test/tree/master/contrail-sanity)
+- [smoke](https://github.com/tungstenfabric/tf-dev-test/tree/master/smoke-test)
+- [contrail-sanity](https://github.com/tungstenfabric/tf-dev-test/tree/master/contrail-sanity)
 
 Generic interface consists of the following environment variables:
 - ORCHESTRATOR      - deployment orchestrator: kubernetes (default) or openstack
@@ -20,8 +20,8 @@ The project is seemlessly integrated with [tf-devstack](https://github.com/tungs
 Example for AIO installation with tf-devstack:
 
 ```bash
-git clone https://github.com/tungstenfabric/tf-test
+git clone https://github.com/tungstenfabric/tf-dev-test
 git clone https://github.com/tungstenfabric/tf-devstack
 ./tf-devstack/ansible/run.sh
-./tf-test/smoke-test/run.sh
+./tf-dev-test/smoke-test/run.sh
 ```
