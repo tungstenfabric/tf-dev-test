@@ -56,9 +56,12 @@ contrail_configuration:
      name: __fip_pool_public__
      network: __public__
      project: k8s-default
+{%- if SSL_ENABLE == 'true' %}
+  # contrail-test check flag existense and doesn't check the value
   SSL_ENABLE: "{{ SSL_ENABLE }}"
   RABBITMQ_USE_SSL: "{{ SSL_ENABLE }}"
   CASSANDRA_SSL_ENABLE: "{{ SSL_ENABLE }}"
+{%- endif %}
 
 deployment:
     orchestrator: kubernetes

@@ -53,9 +53,12 @@ contrail_configuration:
   OPENSTACK_VERSION: {{ OPENSTACK_VERSION }}
   AUTH_MODE: keystone
   KEYSTONE_AUTH_URL_VERSION: /v3
+{%- if SSL_ENABLE == 'true' %}
+  # contrail-test check flag existense and doesn't check the value
   SSL_ENABLE: "{{ SSL_ENABLE }}"
   RABBITMQ_USE_SSL: "{{ SSL_ENABLE }}"
   CASSANDRA_SSL_ENABLE: "{{ SSL_ENABLE }}"
+{%- endif %}
 
 orchestrator_configuration:
   keystone:
