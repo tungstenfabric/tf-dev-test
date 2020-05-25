@@ -60,6 +60,22 @@ echo "prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
 echo "TF test input:"
 cat ./contrail_test_input.yaml
 
+ssl_opts=''
+if [[ "${SSL_ENABLE,,}" == 'true' ]] ; then
+    echo "INFO: SSL enabled. prepare certs from env if exist"
+    sudo mkdir -p /etc/contrail/ssl/private /etc/contrail/ssl/certs
+    if [[ -n "$SSL_KEY" ]]; then
+        echo "$SSL_KEY" | base64 -d -w 0 | sudo tee /etc/contrail/ssl/private/server-privkey.pem > /dev/null
+    fi
+    if [[ -n "$SSL_CERT" ]]; then
+        echo "$SSL_CERT" | base64 -d -w 0 | sudo tee /etc/contrail/ssl/certs/server.pem > /dev/null
+    fi
+    if [[ -n "$SSL_CACERT" ]]; then
+        echo "$SSL_CACERT" | base64 -d -w 0 | sudo tee /etc/contrail/ssl/certs/ca-cert.pem > /dev/null
+    fi
+    ssl_opts='--mount_ssl /etc/contrail/ssl'
+fi
+
 # hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf
 # TODO: fix this in contrail-test
 if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]] ; then
@@ -76,6 +92,7 @@ echo "run tests..."
 if HOME=$WORKSPACE ./testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
+    $ssl_opts \
     -f $TF_TEST_TARGET \
     $TF_TEST_IMAGE ; then
 
