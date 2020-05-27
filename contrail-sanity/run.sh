@@ -39,7 +39,7 @@ echo "[$TF_TEST_NAME]"
 curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
 sudo pip install jinja2 future
 
-if [[ ,${CONTROLLER_NODES}, =~ ,${NODE_IP}, || ,${AGENT_NODES}, =~ ,${NODE_IP}, ]] ; then
+if echo ",${CONTROLLER_NODES},${AGENT_NODES}," | tr ' ' ','  | grep -q ",${NODE_IP}," ; then
     # prepare ssh keys for local connect
     set_ssh_keys $SSH_USER
 fi

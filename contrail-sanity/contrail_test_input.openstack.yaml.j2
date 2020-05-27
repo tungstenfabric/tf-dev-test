@@ -6,8 +6,8 @@ provider_config:
 
 instances:
 {%- if CONTROLLER_NODES is defined and CONTROLLER_NODES|length %}
-{%- set CONTROLLER_NODES = CONTROLLER_NODES.split(',') %}
-{%- set AGENT_NODES = AGENT_NODES.split(',') %}
+{%- set CONTROLLER_NODES = CONTROLLER_NODES.split() %}
+{%- set AGENT_NODES = AGENT_NODES.split() %}
 {%- for node in CONTROLLER_NODES %}
   {{ node | replace(".", "_") }}:
     ip: {{ node }}

@@ -6,13 +6,8 @@ my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
 source "$my_dir/../common/functions.sh"
 
-if [[ $ORCHESTRATOR == "openstack" ]] ; then
-  source "$my_dir/../common/openrc"
-  webui_ip=$(echo $OS_AUTH_URL | cut -d '/' -f3 | cut -d ':' -f 1)
-else
-  nodes=( $(echo $CONTROLLER_NODES | tr ',' ' ') )
-  webui_ip=${nodes[0]}
-fi
+nodes=( $CONTROLLER_NODES )
+webui_ip=${nodes[0]}
 
 res=0
 echo "INFO: check webui response on address $webui_ip:8143"
