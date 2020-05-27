@@ -10,7 +10,9 @@ Generic interface consists of the following environment variables:
 - ORCHESTRATOR      - deployment orchestrator: kubernetes (default) or openstack
 - OPENSTACK_VERSION - version of OpenStack (default is queens, it is for OpenStack deployments only)
 - CONTROLLER_NODES  - list of Contrail Controller nodes (default is the current node - AIO installation)
+                      delimited with space or comma
 - AGENT_NODES       - list of Contrail Agent Controller nodes (default is the current node - AIO installation)
+                      delimited with space or comma
 - DOMAINSUFFIX      - domain name suffix (by default is detected from the current host)
 
 There might be additional parameters depending on a test.

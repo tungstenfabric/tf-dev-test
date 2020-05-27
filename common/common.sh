@@ -29,8 +29,10 @@ export CONTRAIL_CONTAINER_TAG=${CONTRAIL_CONTAINER_TAG:-'latest'}
 
 # defaults stack
 export ORCHESTRATOR=${ORCHESTRATOR:-"kubernetes"}
-export CONTROLLER_NODES=${CONTROLLER_NODES:-$NODE_IP}
-export AGENT_NODES=${AGENT_NODES:-$NODE_IP}
+CONTROLLER_NODES="${CONTROLLER_NODES:-$NODE_IP}"
+export CONTROLLER_NODES="$(echo $CONTROLLER_NODES | tr ' ' ',')"
+AGENT_NODES="${AGENT_NODES:-$NODE_IP}"
+export AGENT_NODES="$(echo $AGENT_NODES | tr ' ' ',')"
 export SSL_ENABLE=${SSL_ENABLE:-false}
 
 # Openstack defaults

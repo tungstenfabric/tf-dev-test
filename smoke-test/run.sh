@@ -13,10 +13,6 @@ echo "[$TF_TEST_NAME]"
 # TODO: to be implemented
 
 printf '%*s\n' 120 | tr ' ' '='
-nodes="$(echo ${CONTROLLER_NODES},${AGENT_NODES} | tr ',' '\n' | sort | uniq)"
-echo "NODES: $nodes"
-
-printf '%*s\n' 120 | tr ' ' '='
 sudo contrail-status
 printf '%*s\n' 120 | tr ' ' '='
 sudo docker ps -a
