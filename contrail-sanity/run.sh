@@ -6,7 +6,7 @@ source "$my_dir/../common/common.sh"
 source "$my_dir/../common/functions.sh"
 
 export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
-export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"pnexus.sytes.net/repository/"}
+export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"nexus.jenkins.progmaticlab.com/repository/"}
 export SSH_USER=${SSH_USER:-$(whoami)}
 
 # 
