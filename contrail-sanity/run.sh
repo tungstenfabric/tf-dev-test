@@ -9,14 +9,13 @@ export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
 export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"nexus.jenkins.progmaticlab.com/repository/"}
 export SSH_USER=${SSH_USER:-$(whoami)}
 
-# 
-TF_TEST_NAME="contrail-test"
+#
 if [ -z "$TF_TEST_IMAGE" ] ; then
-    TF_TEST_IMAGE="${TF_TEST_NAME}-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
+    TF_TEST_IMAGE="contrail-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
 fi
 
-TF_TEST_PROJECT="Juniper/$TF_TEST_NAME.git"
+TF_TEST_PROJECT="tungstenfabric/tf-test.git"
 
 k8s_target='ci_k8s_sanity'
 if [[ "$DEPLOYER" == 'openshift' ]] ; then
@@ -34,7 +33,7 @@ TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.$O
 cd $WORKSPACE
 
 echo 
-echo "[$TF_TEST_NAME]"
+echo "[tf-test]"
 
 curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
 sudo pip install jinja2 future
