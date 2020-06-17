@@ -11,7 +11,7 @@ export SSH_USER=${SSH_USER:-$(whoami)}
 
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
-    TF_TEST_IMAGE="contrail-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
+    TF_TEST_IMAGE="contrail-test-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
 fi
 
