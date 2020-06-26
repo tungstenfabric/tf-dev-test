@@ -48,7 +48,7 @@ openstack flavor create --ram 64 --disk 1 --vcpus 1 m1.micro
 image=$(prepare_image $TEST_IMAGE_NAME)
 
 # Deploy
-first_hypervisor=$(openstack hypervisor list -f value | grep up)
+first_hypervisor=$(openstack hypervisor list -f value | grep up | sort | head -n 1)
 first_hypervisor_name=$(echo $first_hypervisor | cut -d' ' -f2)
 first_hypervisor_ip=$(echo $first_hypervisor | cut -d' ' -f4)
 openstack server create --availability-zone "nova::$first_hypervisor_name" --image "$image" --flavor m1.micro --nic net-id=tf-devstack-test --security-group allow_ssh --wait "$TEST_INSTANCE_NAME"
