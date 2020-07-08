@@ -21,10 +21,22 @@ instances:
       config_database:
       control:
       webui:
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
       openstack:
+{%- endif %}
+{%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
+      vrouter:
+      k8s_master:
+      kubemanager:
+{%- endif %}
 {%- if node in AGENT_NODES %}
       vrouter:
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
       openstack_compute:
+{%- endif %}
+{%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
+      k8s_node:
+{%- endif %}
 {%- endif %}
 {%- endfor %}
 {% endif %}
@@ -37,7 +49,12 @@ instances:
     provider: bms
     roles:
       vrouter:
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
       openstack_compute:
+{%- endif %}
+{%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
+      k8s_node:
+{%- endif %}
 {%- endif %}
 {%- endfor %}
 {%- endif %}
@@ -48,11 +65,20 @@ global_configuration:
 
 contrail_configuration:
   LOG_LEVEL: SYS_DEBUG
-  CLOUD_ORCHESTRATOR: openstack
   CONTRAIL_CONTAINER_TAG: {{ CONTRAIL_CONTAINER_TAG }}
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+  CLOUD_ORCHESTRATOR: openstack
   OPENSTACK_VERSION: {{ OPENSTACK_VERSION }}
   AUTH_MODE: keystone
   KEYSTONE_AUTH_URL_VERSION: /v3
+{%- endif %}
+{%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
+  KUBERNETES_PUBLIC_FIP_POOL:
+     domain: default-domain
+     name: __fip_pool_public__
+     network: __public__
+     project: k8s-default
+{%- endif %}
 {%- if SSL_ENABLE == 'true' %}
   # contrail-test check flag existense and doesn't check the value
   SSL_ENABLE: "{{ SSL_ENABLE }}"
@@ -60,6 +86,7 @@ contrail_configuration:
   CASSANDRA_SSL_ENABLE: "{{ SSL_ENABLE }}"
 {%- endif %}
 
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
 orchestrator_configuration:
   keystone:
     version: v3
@@ -70,9 +97,14 @@ orchestrator_configuration:
 {%- if AUTH_REGION %}
     region: {{ AUTH_REGION }}
 {%- endif %}
+{%- endif %}
 
 deployment:
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
     orchestrator: openstack
+{%- else %}
+    orchestrator: kubernetes
+{%- endif %}
 {%- if DEPLOYER == 'ansible' %}
     deployer: contrail-ansible-deployer
 {%- else %}
@@ -82,6 +114,7 @@ deployment:
 test_configuration:
     image_web_server: {{ IMAGE_WEB_SERVER }}
     use_project_scoped_token: True
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
 {%- if AUTH_PORT %}
     auth_port: {{ AUTH_PORT }}
 {%- endif %}
@@ -90,4 +123,5 @@ test_configuration:
 {%- endif %}
 {%- if AUTH_DOMAIN %}
     test_domain: {{ AUTH_DOMAIN }}
+{%- endif %}
 {%- endif %}
