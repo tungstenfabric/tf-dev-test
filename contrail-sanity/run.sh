@@ -19,14 +19,14 @@ k8s_target='ci_k8s_sanity'
 if [[ "$DEPLOYER" == 'openshift' ]] ; then
   k8s_target='ci_openshift'
 fi
-declare -A default_targets=(['kubernetes']="$k8s_target" ['openstack']='ci_sanity')
+declare -A default_targets=(['kubernetes']="$k8s_target" ['openstack']='ci_sanity' ['all']="ci_sanity,${k8s_target}")
 TF_TEST_TARGET=${TF_TEST_TARGET:-${default_targets[$ORCHESTRATOR]}}
 if [[ -z "$TF_TEST_TARGET" ]]; then
   echo "ERROR: please provide either ORCHESTRATOR or TF_TEST_TARGET"
   exit 1
 fi
 echo "INFO: test_target is $TF_TEST_TARGET"
-TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.$ORCHESTRATOR.yaml.j2"}
+TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.yaml.j2"}
 
 cd $WORKSPACE
 
@@ -90,7 +90,7 @@ if HOME=$WORKSPACE ./testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     $ssl_opts \
-    -f $TF_TEST_TARGET \
+    -T $TF_TEST_TARGET \
     $TF_TEST_IMAGE ; then
 
     echo "WOW! testrunner exited with code 0!"
