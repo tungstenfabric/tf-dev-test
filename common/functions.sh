@@ -59,3 +59,83 @@ function set_ssh_keys() {
     sudo runuser -u $user "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"
   fi
 }
+
+function retry() {
+  local i
+  for ((i=0; i<5; ++i)) ; do
+    if $@ ; then
+      break
+    fi
+    sleep 5
+  done
+  if [[ $i == 5 ]]; then
+    return 1
+  fi
+}
+
+function install_docker_ubuntu() {
+  export DEBIAN_FRONTEND=noninteractive
+  which docker && return
+  apt-get update
+  apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  add-apt-repository -y -u "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  retry apt-get install -y "docker-ce=18.06.3~ce~3-0~ubuntu"
+}
+
+function install_docker_centos() {
+  which docker && return
+  yum install -y yum-utils device-mapper-persistent-data lvm2
+  if ! yum info docker-ce &> /dev/null ; then
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  fi
+  retry yum install -y docker-ce-18.03.1.ce
+}
+
+function install_docker_rhel() {
+  which docker && return
+  if [[ "$ENABLE_RHSM_REPOS" == "true" ]]; then
+    subscription-manager repos \
+      --enable rhel-7-server-extras-rpms \
+      --enable rhel-7-server-optional-rpms
+  fi
+  retry yum install -y docker device-mapper-libs device-mapper-event-libs
+}
+
+function check_docker_value() {
+  local name=$1
+  local value=$2
+  python -c "import json; f=open('/etc/docker/daemon.json'); data=json.load(f); print(data.get('$name'));" 2>/dev/null| grep -qi "$value"
+}
+
+function ensure_root() {
+  local me=$(whoami)
+  if [ "$me" != 'root' ] ; then
+    echo "ERROR: this script requires root:"
+    echo "       mysudo -E $0"
+    return 1
+  fi
+}
+
+function install_prerequisites_centos() {
+  local pkgs=""
+  which lsof || pkgs+=" lsof"
+  which python || pkgs+=" python"
+  if [ -n "$pkgs" ] ; then
+    mysudo yum install -y $pkgs
+  fi
+}
+
+function install_prerequisites_rhel() {
+  install_prerequisites_centos
+}
+
+function install_prerequisites_ubuntu() {
+  local pkgs=""
+  which lsof || pkgs+=" lsof"
+  which python || pkgs+=" python-minimal"
+  if [ -n "$pkgs" ] ; then
+    export DEBIAN_FRONTEND=noninteractive
+    mysudo -E apt-get install -y $pkgs
+  fi
+}
