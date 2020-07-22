@@ -15,12 +15,6 @@ if [ -z "$TF_TEST_IMAGE" ] ; then
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
 fi
 
-echo '[ensure python is present]'
-install_prerequisites_$DISTRO
-
-# prepare env
-sudo -E $my_dir/../common/setup_docker.sh
-
 k8s_target='ci_k8s_sanity'
 if [[ "$DEPLOYER" == 'openshift' ]] ; then
   k8s_target='ci_openshift'
@@ -36,7 +30,7 @@ TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.ya
 
 cd $WORKSPACE
 
-echo
+echo 
 echo "[tf-test]"
 
 curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
