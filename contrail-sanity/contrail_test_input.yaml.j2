@@ -1,3 +1,10 @@
+{%- if CONTROLLER_NODES is defined and CONTROLLER_NODES|length %}
+{%- set CONTROLLER_NODES = CONTROLLER_NODES.split() %}
+{% endif %}
+{%- if AGENT_NODES is defined and AGENT_NODES|length %}
+{%- set AGENT_NODES = AGENT_NODES.split() %}
+{% endif %}
+
 provider_config:
   bms:
     ssh_user: "{{ SSH_USER }}"
@@ -5,9 +12,6 @@ provider_config:
     domainsuffix: "{{ DOMAINSUFFIX }}"
 
 instances:
-{%- if CONTROLLER_NODES is defined and CONTROLLER_NODES|length %}
-{%- set CONTROLLER_NODES = CONTROLLER_NODES.split() %}
-{%- set AGENT_NODES = AGENT_NODES.split() %}
 {%- for node in CONTROLLER_NODES %}
   {{ node | replace(".", "_") }}:
     ip: {{ node }}
@@ -22,12 +26,15 @@ instances:
       control:
       webui:
 {%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+{%- if OPENSTACK_API_VIP is not defined or OPENSTACK_API_VIP|length %}
       openstack:
+{%- endif %}
 {%- endif %}
 {%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
       vrouter:
       k8s_master:
       kubemanager:
+{%- endif %}
 {%- endif %}
 {%- if node in AGENT_NODES %}
       vrouter:
@@ -39,7 +46,6 @@ instances:
 {%- endif %}
 {%- endif %}
 {%- endfor %}
-{% endif %}
 
 {%- if AGENT_NODES is defined and AGENT_NODES|length %}
 {%- for node in AGENT_NODES %}
@@ -57,6 +63,14 @@ instances:
 {%- endif %}
 {%- endif %}
 {%- endfor %}
+{%- endif %}
+
+{%- if OPENSTACK_API_VIP is defined and OPENSTACK_API_VIP|length %}
+  {{ OPENSTACK_API_VIP | replace(".", "_") }}:
+    ip: {{ OPENSTACK_API_VIP }}
+    provider: bms
+    roles:
+      openstack:
 {%- endif %}
 
 global_configuration:
