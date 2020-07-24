@@ -1,3 +1,12 @@
+{%- if CONTROLLER_NODES is defined and CONTROLLER_NODES|length %}
+{%- set CONTROLLER_NODES = CONTROLLER_NODES.split() %}
+{%- endif %}
+{%- if AGENT_NODES is defined and AGENT_NODES|length %}
+{%- set AGENT_NODES = AGENT_NODES.split() %}
+{%- endif %}
+{%- if OPENSTACK_CONTROLLER_NODES is defined and OPENSTACK_CONTROLLER_NODES|length %}
+{%- set OPENSTACK_CONTROLLER_NODES = OPENSTACK_CONTROLLER_NODES.split() %}
+{%- endif -%}
 provider_config:
   bms:
     ssh_user: "{{ SSH_USER }}"
@@ -5,9 +14,6 @@ provider_config:
     domainsuffix: "{{ DOMAINSUFFIX }}"
 
 instances:
-{%- if CONTROLLER_NODES is defined and CONTROLLER_NODES|length %}
-{%- set CONTROLLER_NODES = CONTROLLER_NODES.split() %}
-{%- set AGENT_NODES = AGENT_NODES.split() %}
 {%- for node in CONTROLLER_NODES %}
   {{ node | replace(".", "_") }}:
     ip: {{ node }}
@@ -21,7 +27,8 @@ instances:
       config_database:
       control:
       webui:
-{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+{%- if (ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all') and
+       (OPENSTACK_CONTROLLER_NODES is undefined or OPENSTACK_CONTROLLER_NODES|length == 0 or node in OPENSTACK_CONTROLLER_NODES) %}
       openstack:
 {%- endif %}
 {%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
@@ -39,8 +46,6 @@ instances:
 {%- endif %}
 {%- endif %}
 {%- endfor %}
-{% endif %}
-
 {%- if AGENT_NODES is defined and AGENT_NODES|length %}
 {%- for node in AGENT_NODES %}
 {%- if node not in CONTROLLER_NODES %}
@@ -55,6 +60,18 @@ instances:
 {%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
       k8s_node:
 {%- endif %}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+
+{%- if OPENSTACK_CONTROLLER_NODES is defined and OPENSTACK_CONTROLLER_NODES|length %}
+{%- for node in OPENSTACK_CONTROLLER_NODES %}
+{%- if node not in CONTROLLER_NODES and node not in AGENT_NODES %}
+  {{ node | replace(".", "_") }}:
+    ip: {{ node }}
+    provider: bms
+    roles:
+      openstack:
 {%- endif %}
 {%- endfor %}
 {%- endif %}
