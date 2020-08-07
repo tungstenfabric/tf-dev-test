@@ -11,9 +11,7 @@ export SSH_USER=${SSH_USER:-$(whoami)}
 
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
-    # we're building queens only
-    # https://github.com/tungstenfabric/tf-dev-env/blob/master/scripts/package/build-test-containers.sh#L19
-    TF_TEST_IMAGE="contrail-test-test:queens-${CONTRAIL_CONTAINER_TAG}"
+    TF_TEST_IMAGE="contrail-test-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
 fi
 
