@@ -13,7 +13,17 @@ export SSH_USER=${SSH_USER:-$(whoami)}
 if [ -z "$TF_TEST_IMAGE" ] ; then
     TF_TEST_IMAGE="contrail-test-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
+else
+    echo "DEBUG:  TF_TEST_IMAGE=$TF_TEST_IMAGE"
+    # TODO:
+    # in this case it's registry should be added as INSECURE
 fi
+
+echo '[ensure python is present]'
+install_prerequisites_$DISTRO
+
+# prepare env
+sudo -E $my_dir/../common/setup_docker.sh
 
 k8s_target='ci_k8s_sanity'
 if [[ "$DEPLOYER" == 'openshift' ]] ; then
