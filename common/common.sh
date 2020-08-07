@@ -19,7 +19,7 @@ set -o allexport
 set +o allexport
 
 # determined variables
-DISTRO=$(cat /etc/*release | egrep '^ID=' | awk -F= '{print $2}' | tr -d \")
+export DISTRO=$(cat /etc/*release | egrep '^ID=' | awk -F= '{print $2}' | tr -d \")
 PHYS_INT=`ip route get 1 | grep -o 'dev.*' | awk '{print($2)}'`
 NODE_IP=`ip addr show dev $PHYS_INT | grep 'inet ' | awk '{print $2}' | head -n 1 | cut -d '/' -f 1`
 

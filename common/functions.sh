@@ -59,3 +59,39 @@ function set_ssh_keys() {
     sudo runuser -u $user "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"
   fi
 }
+
+function install_prerequisites_centos() {
+  local pkgs=""
+  which lsof || pkgs+=" lsof"
+  which python || pkgs+=" python"
+  if [ -n "$pkgs" ] ; then
+    sudo yum install -y $pkgs
+  fi
+}
+
+function install_prerequisites_rhel() {
+  RHEL_VERSION=$( cat /etc/redhat-release |  egrep -o "[0-9]*\." | cut -d '.' -f1 )
+  local pkgs=""
+  which lsof || pkgs+=" lsof"
+  if [[ "$RHEL_VERSION" == "7" ]]; then
+    which python || pkgs+=" python"
+  elif [[ "$RHEL_VERSION" == "8" ]]; then
+    which python3 || pkgs+=" python3"
+  fi
+  
+  if [ -n "$pkgs" ] ; then
+    sudo yum install -y $pkgs
+  fi
+
+  python --version || alternatives --set python /usr/bin/python3
+}
+
+function install_prerequisites_ubuntu() {
+  local pkgs=""
+  which lsof || pkgs+=" lsof"
+  which python || pkgs+=" python-minimal"
+  if [ -n "$pkgs" ] ; then
+    export DEBIAN_FRONTEND=noninteractive
+    sudo -E apt-get install -y $pkgs
+  fi
+}
