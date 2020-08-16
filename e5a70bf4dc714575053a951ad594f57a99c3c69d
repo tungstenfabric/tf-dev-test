@@ -1,0 +1,163 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "52923816_4a2d9f2f",
+        "filename": "common/functions.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "+x is not required here",
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c582687b_690ec637",
+        "filename": "common/setup_docker.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "please remove \u0027-x\u0027 when code is ready",
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "97904611_07087077",
+        "filename": "common/setup_docker.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "please add \"retry ...\" here and below",
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db4d3fd6_5e905035",
+        "filename": "common/setup_docker.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "please try to maintain indents equal through the file",
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "586a46d7_960a1621",
+        "filename": "common/setup_docker.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "please remove commented lines",
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38902c84_b96f203d",
+        "filename": "common/setup_docker.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "let\u0027s check for rhel8 and fail in this case",
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a10db2ab_94e3ab47",
+        "filename": "common/setup_docker.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "let\u0027s split this code to several steps/functions:\n\nfor param in \u0027mtu\u0027 \u0027live-restore\u0027 \u0027insecure-registries\u0027\n    check the way was used to configure docker\n    then configure depends on way.\n\ncurrent code works well but it would be hard to maintain/modify - for example we have to add MTU if it\u0027s not there (otherwise script will randomly fail in vexxhost)",
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43e3c869_85995ffb",
+        "filename": "common/setup_docker.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "this(docker restart) should be done only if we made docker\u0027s reconfiguration",
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e731f487_216b1b12",
+        "filename": "contrail-sanity/run.sh",
+        "patchSetId": 22
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-08-16T18:20:58Z",
+      "side": 1,
+      "message": "please see that TF_TEST_IMAGE can be set. in this case it\u0027s registry should be added as INSECURE. (I agree just to add TODO here and fix this later - right now we don\u0027t have such cases)",
+      "range": {
+        "startLine": 13,
+        "startChar": 10,
+        "endLine": 13,
+        "endChar": 23
+      },
+      "revId": "e5a70bf4dc714575053a951ad594f57a99c3c69d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
