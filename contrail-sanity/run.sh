@@ -1,5 +1,5 @@
 #!/bin/bash -e
-
+set -x
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
@@ -14,11 +14,13 @@ export SSH_USER=${SSH_USER:-$(whoami)}
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
     TF_TEST_IMAGE="contrail-test-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
+    #TF_TEST_IMAGE="contrail-test-test:queens-master-6_0_6_9_6-1-rhel7"
+    #TF_TEST_IMAGE="contrail-test-test:train-train-6_0_7_2_5-4-rhel7"
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
 else
-    echo "DEBUG:  TF_TEST_IMAGE=$TF_TEST_IMAGE"
+    echo "INFO:  TF_TEST_IMAGE=$TF_TEST_IMAGE; in this case it's registry will be added as INSECURE"
     # TODO:
-    # in this case it's registry should be added as INSECURE
+    TF_TEST_IMAGE_REGISTRY=""
 fi
 
 echo '[ensure python is present]'
@@ -55,12 +57,38 @@ fi
 
 # get testrunner.sh project
 echo "get testrunner.sh"
-sudo docker pull $TF_TEST_IMAGE
+
+if ! sudo docker pull $TF_TEST_IMAGE && [ "$OPENSTACK_VERSION" != 'queens' ]; then
+    TF_TEST_IMAGE=$(echo $TF_TEST_IMAGE | sed "s/$OPENSTACK_VERSION/queens/g")
+    sudo docker pull $TF_TEST_IMAGE
+fi
+
+
 tmp_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 sudo docker create --name $tmp_name $TF_TEST_IMAGE
 sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
 sudo docker rm $tmp_name
 
+if [ -d "./testrunner.sh" ]; then
+    echo "./testrunner is a directory"
+    ls ./testrunner.sh
+    testdir="./testrunner.sh/"
+    if [ -e "./testrunner.sh/testrunner.sh" ]; then
+        echo "./testrunner.sh/testrunner.sh exists! let's cat it"
+        cat ./testrunner.sh/testrunner.sh
+        echo "####enf of cat####"
+    fi
+elif [ -f "./testrunner.sh" ]; then
+    echo "./testrunner.sh is a file"
+     echo "./testrunner.sh exists! let's cat it"
+     cat ./testrunner.sh
+     echo "####enf of cat####"
+     testdir="./"
+else
+    echo " ooops testrunner is not a dir neither a file"
+fi
+
+testdir=$([[ "$RHEL_VERSION" == "rhel8" ]] && echo "./testrunner.sh/" || echo "./")
 # run tests:
 
 echo "prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
@@ -98,7 +126,7 @@ fi
 echo "run tests..."
 
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
-if HOME=$WORKSPACE ./testrunner.sh run \
+if HOME=$WORKSPACE "$testdir"testrunner.sh run \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     $ssl_opts \
