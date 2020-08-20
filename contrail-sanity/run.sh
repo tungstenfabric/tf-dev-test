@@ -1,5 +1,5 @@
 #!/bin/bash -e
-
+set -x
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
@@ -9,11 +9,25 @@ export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
 export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"nexus.jenkins.progmaticlab.com/repository/"}
 export SSH_USER=${SSH_USER:-$(whoami)}
 
+[ "$DISTRO" == "rhel" ] && export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
+
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
-    TF_TEST_IMAGE="contrail-test-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
+    #TF_TEST_IMAGE="contrail-test-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
+    TF_TEST_IMAGE="contrail-test-test:queens-master-6_0_6_9_6-1-rhel7"
+    #TF_TEST_IMAGE="contrail-test-test:train-train-6_0_7_2_5-4-rhel7"
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
+else
+    echo "INFO:  TF_TEST_IMAGE=$TF_TEST_IMAGE; in this case it's registry will be added as INSECURE"
+    # TODO:
+    TF_TEST_IMAGE_REGISTRY=""
 fi
+
+echo '[ensure python is present]'
+install_prerequisites_$DISTRO
+
+# prepare env
+sudo -E $my_dir/../common/setup_docker.sh
 
 k8s_target='ci_k8s_sanity'
 if [[ "$DEPLOYER" == 'openshift' ]] ; then
@@ -30,11 +44,11 @@ TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.ya
 
 cd $WORKSPACE
 
-echo 
+echo
 echo "[tf-test]"
 
 curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
-sudo pip install jinja2 future
+sudo python -m pip install jinja2 future
 
 if echo ",${CONTROLLER_NODES},${AGENT_NODES}," | tr ' ' ','  | grep -q ",${NODE_IP}," ; then
     # prepare ssh keys for local connect
