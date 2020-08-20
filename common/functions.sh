@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 function wait_cmd_success() {
     local cmd=$1
     local interval=${2:-3}
@@ -47,6 +47,8 @@ function set_ssh_keys() {
     fi
 }
 
+### install_prerequisites_DISTRO functions
+
 function install_prerequisites_centos() {
     local pkgs=""
     which lsof || pkgs+=" lsof"
@@ -57,6 +59,14 @@ function install_prerequisites_centos() {
 }
 
 function install_prerequisites_rhel() {
+    if [[ "$RHEL_VERSION" == 'rhel8' ]] && ! which python ; then
+        which python3 || sudo yum install -y python3
+    #if [ -L "/usr/bin/python" ]; then
+    #    sudo rm -f "/usr/bin/python"
+    fi
+    #sudo ln -s "$(which python3)" /usr/bin/python
+    sudo alternatives --set python /usr/bin/python3
+    #fi
     install_prerequisites_centos
 }
 
@@ -69,3 +79,4 @@ function install_prerequisites_ubuntu() {
         sudo -E apt-get install -y $pkgs
     fi
 }
+
