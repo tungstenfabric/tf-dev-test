@@ -1,5 +1,5 @@
 #!/bin/bash -e
-
+set -x
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
@@ -10,15 +10,16 @@ export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"nexus.jenkins.progmaticlab.com/repos
 export SSH_USER=${SSH_USER:-$(whoami)}
 
 [ "$DISTRO" == "rhel" ] && export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
-
+export DOCKER_CMD="docker"
+[ "$RHEL_VERSION" == "rhel8" ] && DOCKER_CMD="podman"
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
     TF_TEST_IMAGE="contrail-test-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
 else
-    echo "DEBUG:  TF_TEST_IMAGE=$TF_TEST_IMAGE"
+    echo "INFO:  TF_TEST_IMAGE=$TF_TEST_IMAGE; in this case it's registry will be added as INSECURE"
     # TODO:
-    # in this case it's registry should be added as INSECURE
+    TF_TEST_IMAGE_REGISTRY=""
 fi
 
 echo '[ensure python is present]'
@@ -55,11 +56,16 @@ fi
 
 # get testrunner.sh project
 echo "get testrunner.sh"
-sudo docker pull $TF_TEST_IMAGE
+
+if ! sudo $DOCKER_CMD pull $TF_TEST_IMAGE && [ "$OPENSTACK_VERSION" != 'queens' ]; then
+    TF_TEST_IMAGE=$(echo $TF_TEST_IMAGE | sed "s/$OPENSTACK_VERSION/queens/g")
+    OPENSTACK_VERSION='queens'
+    sudo $DOCKER_CMD pull $TF_TEST_IMAGE
+fi
 tmp_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
-sudo docker create --name $tmp_name $TF_TEST_IMAGE
-sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
-sudo docker rm $tmp_name
+sudo $DOCKER_CMD create --name $tmp_name $TF_TEST_IMAGE
+sudo $DOCKER_CMD cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
+sudo $DOCKER_CMD rm $tmp_name
 
 # run tests:
 
@@ -98,8 +104,12 @@ fi
 echo "run tests..."
 
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
+
+#RHEL8_WORKAROUND=$([[ "$RHEL_VERSION" == "rhel8" ]] && echo "-H ''" || echo "")
+
 if HOME=$WORKSPACE ./testrunner.sh run \
     -P ./contrail_test_input.yaml \
+    -H '' \
     -k ~/.ssh/id_rsa \
     $ssl_opts \
     -T $TF_TEST_TARGET \
