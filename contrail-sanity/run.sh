@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+[[ "$DEBUG" == 'true' ]] && set -x
+set -x
+
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
@@ -13,7 +16,7 @@ export SSH_USER=${SSH_USER:-$(whoami)}
 
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
-    TF_TEST_IMAGE="contrail-test-test:${OPENSTACK_VERSION}-${CONTRAIL_CONTAINER_TAG}"
+    TF_TEST_IMAGE="contrail-test-test:${CONTRAIL_CONTAINER_TAG}"
     [ -n "$CONTAINER_REGISTRY" ] && TF_TEST_IMAGE="${CONTAINER_REGISTRY}/${TF_TEST_IMAGE}"
 else
     echo "DEBUG:  TF_TEST_IMAGE=$TF_TEST_IMAGE"
