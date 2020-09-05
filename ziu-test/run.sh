@@ -55,6 +55,10 @@ while true; do
   status="$(juju status)"
   if [[ $status =~ "ziu" ]]; then
     i=$((i + 1))
+    if (( i > 12 )) ; then
+      echo "ERROR: ziu is still in progress after 120s"
+      exit 1
+    fi
   else
     echo -e "\nINFO:  done in $((i*10))"
     break
