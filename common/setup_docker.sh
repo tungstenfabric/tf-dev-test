@@ -1,8 +1,6 @@
 #!/bin/bash -e
 
-scriptdir=$(realpath $(dirname "$0"))
-source ${scriptdir}/common.sh
-source ${scriptdir}/functions.sh
+# do not source common.sh - it sources stack profile and breaks variables are set after the first call
 
 function retry() {
     local i
