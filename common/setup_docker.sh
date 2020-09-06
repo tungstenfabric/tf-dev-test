@@ -114,7 +114,7 @@ fi
 if [ -z "$INSECURE_REGISTRIES" ]; then
     DOCKER_CONFIG="/etc/docker/daemon.json" 
 else
-    DOCKER_CONFIG="/etc/sysconfig/docker")
+    DOCKER_CONFIG="/etc/sysconfig/docker"
 fi
 
 if [ -e $DOCKER_CONFIG ] && grep -q $CONTAINER_REGISTRY $DOCKER_CONFIG; then
