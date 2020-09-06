@@ -69,9 +69,9 @@ function is_registry_insecure() {
 
 ensure_root
 
-echo
-echo '[docker install]'
-echo "$DISTRO detected"
+echo ""
+echo 'INFO: [docker install]'
+echo "INFO: distro=$DISTRO detected"
 
 if ! which docker >/dev/null 2>&1 ; then
     if [ x"$DISTRO" == x"centos" ]; then
@@ -80,7 +80,7 @@ if ! which docker >/dev/null 2>&1 ; then
         systemctl start docker
     elif [ x"$DISTRO" == x"rhel" ]; then
         if [ "$RHEL_VERSION" == "rhel8" ]; then
-            echo "we don't support rhel8 now"
+            echo "ERROR: we don't support rhel8 now"
             exit 1
         fi
         systemctl stop firewalld || true
@@ -90,18 +90,18 @@ if ! which docker >/dev/null 2>&1 ; then
         install_docker_ubuntu
     fi
 else
-  echo "docker installed: $(docker --version)"
+  echo "INFO: docker installed: $(docker --version)"
 fi
 
 echo
 echo '[docker config]'
 
 if [[ -z "${CONTAINER_REGISTRY}" ]]; then
-    echo "${CONTAINER_REGISTRY} is not defined."
+    echo "INFO: CONTAINER_REGISTRY is not defined. skip docker configuration"
     exit
 elif ! is_registry_insecure "$CONTAINER_REGISTRY" ; then
-     echo "${CONTAINER_REGISTRY} is secure. exit"
-     exit
+    echo "INFO: registry ${CONTAINER_REGISTRY} is secure. skip docker configuration"
+    exit
 fi
 
 if [ -e "/etc/sysconfig/docker" ]; then
@@ -111,25 +111,28 @@ else
     INSECURE_REGISTRIES=""
 fi
 
-DOCKER_CONFIG=$([[ -z $INSECURE_REGISTRIES ]] && echo "/etc/docker/daemon.json" || echo "/etc/sysconfig/docker")
-
+if [ -z "$INSECURE_REGISTRIES" ]; then
+    DOCKER_CONFIG="/etc/docker/daemon.json" 
+else
+    DOCKER_CONFIG="/etc/sysconfig/docker")
+fi
 
 if [ -e $DOCKER_CONFIG ] && grep -q $CONTAINER_REGISTRY $DOCKER_CONFIG; then
-    echo "Registry $CONTAINER_REGISTRY is configured in $DOCKER_CONFIG. Skip."
-    exit 0
+    echo "INFO: Registry $CONTAINER_REGISTRY is already configured in $DOCKER_CONFIG. skip docker configuration"
+    exit
 fi
 
 if [ ! -e $DOCKER_CONFIG ]; then
     touch $DOCKER_CONFIG
 fi
 
+echo "INFO: fix $DOCKER_CONFIG"
 if [ "$DOCKER_CONFIG" == "/etc/sysconfig/docker" ]; then
     INSECURE_REGISTRIES+=" --insecure-registry $CONTAINER_REGISTRY"
     sudo sed -i '/^INSECURE_REGISTRY/d' "$DOCKER_CONFIG"
     echo "INSECURE_REGISTRY=\"$INSECURE_REGISTRIES\""  | sudo tee -a "$DOCKER_CONFIG"
     sudo cat "$DOCKER_CONFIG"
-elif [ "$DOCKER_CONFIG" == "/etc/docker/daemon.json" ]; then
-    echo "plan B [$DOCKER_CONFIG]"
+else # [ "$DOCKER_CONFIG" == "/etc/docker/daemon.json" ]; then
     python <<EOF
 import json
 data=dict()
@@ -145,13 +148,10 @@ data['live-restore'] = True
 with open("${DOCKER_CONFIG}", 'w') as f:
   data = json.dump(data, f, sort_keys=True, indent=4)
 EOF
-else
-    echo "plan D [$DOCKER_CONFIG] bad news"
-    echo "ERROR: incorrect insecure registries' file '$DOCKER_CONFIG'"
 fi
 
-echo
-echo '[restart docker]'
+echo ""
+echo "INFO: [restart docker]"
 
 if [ x"$DISTRO" == x"centos" -o x"$DISTRO" == x"rhel" ] ; then
     systemctl restart docker
@@ -161,4 +161,3 @@ else
     echo "ERROR: unknown distro $DISTRO"
     exit 1
 fi
-

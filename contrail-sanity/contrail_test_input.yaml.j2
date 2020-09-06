@@ -76,10 +76,6 @@ instances:
 {%- endfor %}
 {%- endif %}
 
-global_configuration:
-  CONTAINER_REGISTRY: {{ CONTAINER_REGISTRY }}
-  REGISTRY_PRIVATE_INSECURE: True
-
 contrail_configuration:
   LOG_LEVEL: SYS_DEBUG
   CONTRAIL_CONTAINER_TAG: {{ CONTRAIL_CONTAINER_TAG }}
