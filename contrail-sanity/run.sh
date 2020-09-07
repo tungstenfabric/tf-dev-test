@@ -1,5 +1,5 @@
 #!/bin/bash -e
-
+set -x
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
@@ -36,8 +36,8 @@ fi
 declare -A default_targets=(['kubernetes']="$k8s_target" ['openstack']='ci_sanity' ['all']="ci_sanity,${k8s_target}")
 TF_TEST_TARGET=${TF_TEST_TARGET:-${default_targets[$ORCHESTRATOR]}}
 if [[ -z "$TF_TEST_TARGET" ]]; then
-    echo "ERROR: please provide either ORCHESTRATOR or TF_TEST_TARGET"
-    exit 1
+  echo "ERROR: please provide either ORCHESTRATOR or TF_TEST_TARGET"
+  exit 1
 fi
 echo "INFO: test_target is $TF_TEST_TARGET"
 TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.yaml.j2"}
@@ -54,7 +54,11 @@ fi
 
 # get testrunner.sh project
 echo "INFO: get testrunner.sh from image"
-sudo docker pull $TF_TEST_IMAGE
+if ! sudo docker pull $TF_TEST_IMAGE && [ "$OPENSTACK_VERSION" != 'queens' ]; then
+    TF_TEST_IMAGE=$(echo $TF_TEST_IMAGE | sed "s/$OPENSTACK_VERSION/queens/g")
+    OPENSTACK_VERSION='queens'
+    sudo docker pull $TF_TEST_IMAGE
+fi
 tmp_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 sudo docker create --name $tmp_name $TF_TEST_IMAGE
 sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
@@ -62,10 +66,10 @@ sudo docker rm $tmp_name
 
 # run tests:
 
-echo "INFO: prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
+echo "prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
 "$my_dir/../common/jinja2_render.py" < $TF_TEST_INPUT_TEMPLATE > ./contrail_test_input.yaml
 
-echo "INFO: TF test input:"
+echo "TF test input:"
 cat ./contrail_test_input.yaml
 
 ssl_opts=''
@@ -87,17 +91,24 @@ fi
 # hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf
 # TODO: fix this in contrail-test
 if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]] ; then
-      if [[ ! -f /etc/kubernetes/admin.conf && -f ~/.kube/config ]] ; then
-        sudo mkdir -p /etc/kubernetes/
-        sudo cp ~/.kube/config /etc/kubernetes/admin.conf
-    fi
-    sudo chmod 644 /etc/kubernetes/admin.conf || /bin/true
+  if [[ ! -f /etc/kubernetes/admin.conf && -f ~/.kube/config ]] ; then
+    sudo mkdir -p /etc/kubernetes/
+    sudo cp ~/.kube/config /etc/kubernetes/admin.conf
+  fi
+  sudo chmod 644 /etc/kubernetes/admin.conf || /bin/true
 fi
 
-echo "INFO: run tests..."
+echo "run tests..."
 
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
-if HOME=$WORKSPACE ./testrunner.sh run \
+
+use_host_networking=''
+# if docker is a symlink of podman
+if readlink -f "$( which docker)" | grep -q "podman" ; then
+    use_host_networking='-H'
+fi
+
+if HOME=$WORKSPACE ./testrunner.sh run $use_host_networking \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     $ssl_opts \

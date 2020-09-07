@@ -76,6 +76,10 @@ instances:
 {%- endfor %}
 {%- endif %}
 
+global_configuration:
+  CONTAINER_REGISTRY: {{ CONTAINER_REGISTRY }}
+  REGISTRY_PRIVATE_INSECURE: True
+
 contrail_configuration:
   LOG_LEVEL: SYS_DEBUG
   CONTRAIL_CONTAINER_TAG: {{ CONTRAIL_CONTAINER_TAG }}
@@ -132,7 +136,7 @@ test_configuration:
     auth_port: {{ AUTH_PORT }}
 {%- endif %}
 {%- if AUTH_URL %}
-    auth_url: {{ AUTH_URL }}
+    auth_url: "{{ AUTH_URL }}//v3"
 {%- endif %}
 {%- if AUTH_DOMAIN %}
     test_domain: {{ AUTH_DOMAIN }}
