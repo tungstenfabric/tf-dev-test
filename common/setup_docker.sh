@@ -42,7 +42,7 @@ function install_docker_rhel() {
 function check_docker_value() {
     local name=$1
     local value=$2
-    python -c "import json; f=open('/etc/docker/daemon.json'); data=json.load(f); print(data.get('$name'));" 2>/dev/null| grep -qi "$value"
+    python3 -c "import json; f=open('/etc/docker/daemon.json'); data=json.load(f); print(data.get('$name'));" 2>/dev/null| grep -qi "$value"
 }
 
 function ensure_root() {
@@ -131,7 +131,7 @@ if [ "$DOCKER_CONFIG" == "/etc/sysconfig/docker" ]; then
     echo "INSECURE_REGISTRY=\"$INSECURE_REGISTRIES\""  | sudo tee -a "$DOCKER_CONFIG"
     sudo cat "$DOCKER_CONFIG"
 else # [ "$DOCKER_CONFIG" == "/etc/docker/daemon.json" ]; then
-    python <<EOF
+    python3 <<EOF
 import json
 data=dict()
 try:
