@@ -50,7 +50,7 @@ function set_ssh_keys() {
 function install_prerequisites_centos() {
     local pkgs=""
     which lsof || pkgs+=" lsof"
-    which python || pkgs+=" python"
+    which python3 || pkgs+=" python3"
     if [ -n "$pkgs" ] ; then
         sudo yum install -y $pkgs
     fi
@@ -63,7 +63,7 @@ function install_prerequisites_rhel() {
 function install_prerequisites_ubuntu() {
     local pkgs=""
     which lsof || pkgs+=" lsof"
-    which python || pkgs+=" python-minimal"
+    which python3 || pkgs+=" python3-minimal"
     if [ -n "$pkgs" ] ; then
         export DEBIAN_FRONTEND=noninteractive
         sudo -E apt-get install -y $pkgs

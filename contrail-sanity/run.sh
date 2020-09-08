@@ -23,7 +23,7 @@ else
     export CONTAINER_REGISTRY="$(echo $TF_TEST_IMAGE | cut -d '/' -f 1)"
 fi
 
-echo 'INFO: [ensure python is present]'
+echo 'INFO: [ensure python3 is present]'
 install_prerequisites_$DISTRO
 
 # prepare env
@@ -44,8 +44,8 @@ TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.ya
 
 cd $WORKSPACE
 
-curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
-sudo python -m pip install jinja2 future
+python3 -m pip --version || curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
+sudo python3 -m pip install jinja2 future
 
 if echo ",${CONTROLLER_NODES},${AGENT_NODES}," | tr ' ' ','  | grep -q ",${NODE_IP}," ; then
     # prepare ssh keys for local connect
