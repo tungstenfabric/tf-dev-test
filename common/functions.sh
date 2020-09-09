@@ -47,6 +47,8 @@ function set_ssh_keys() {
     fi
 }
 
+### install_prerequisites_DISTRO functions
+
 function install_prerequisites_centos() {
     local pkgs=""
     which lsof || pkgs+=" lsof"
