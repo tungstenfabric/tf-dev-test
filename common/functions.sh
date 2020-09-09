@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 function wait_cmd_success() {
     local cmd=$1
     local interval=${2:-3}
@@ -46,6 +46,8 @@ function set_ssh_keys() {
         sudo runuser -u $user "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"
     fi
 }
+
+### install_prerequisites_DISTRO functions
 
 function install_prerequisites_centos() {
     local pkgs=""
