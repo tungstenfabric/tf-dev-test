@@ -61,11 +61,8 @@ function install_prerequisites_rhel() {
 }
 
 function install_prerequisites_ubuntu() {
-    local pkgs=""
+    local pkgs="python3-minimal python3-distutils"
     which lsof || pkgs+=" lsof"
-    which python3 || pkgs+=" python3-minimal"
-    if [ -n "$pkgs" ] ; then
-        export DEBIAN_FRONTEND=noninteractive
-        sudo -E apt-get install -y $pkgs
-    fi
+    export DEBIAN_FRONTEND=noninteractive
+    sudo -E apt-get install -y $pkgs
 }

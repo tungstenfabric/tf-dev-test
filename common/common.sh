@@ -15,7 +15,10 @@ TF_STACK_PROFILE="${TF_CONFIG_DIR}/stack.env"
 
 # import tf profile that created by devstack into current context
 set -o allexport
-[ -e "$TF_STACK_PROFILE" ] && source "$TF_STACK_PROFILE"
+if [ -e "$TF_STACK_PROFILE" ] ; then
+  cat "$TF_STACK_PROFILE"
+  source "$TF_STACK_PROFILE"
+fi
 set +o allexport
 
 # determined variables
