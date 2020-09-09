@@ -132,7 +132,11 @@ test_configuration:
     auth_port: {{ AUTH_PORT }}
 {%- endif %}
 {%- if AUTH_URL %}
+{%- if 'v3' in {{ AUTH_URL }} %}
     auth_url: {{ AUTH_URL }}
+{%- else %}
+    auth_url: {{ AUTH_URL }}/v3
+{%- endif %}
 {%- endif %}
 {%- if AUTH_DOMAIN %}
     test_domain: {{ AUTH_DOMAIN }}
