@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 function wait_cmd_success() {
     local cmd=$1
     local interval=${2:-3}
@@ -47,6 +47,8 @@ function set_ssh_keys() {
     fi
 }
 
+### install_prerequisites_DISTRO functions
+
 function install_prerequisites_centos() {
     local pkgs=""
     which lsof || pkgs+=" lsof"
@@ -54,6 +56,10 @@ function install_prerequisites_centos() {
     if [ -n "$pkgs" ] ; then
         sudo yum install -y $pkgs
     fi
+    if [ -L "/usr/bin/python" ]; then
+        sudo rm -f "/usr/bin/python"
+    fi  
+    sudo alternatives --set python /usr/bin/python3
 }
 
 function install_prerequisites_rhel() {
@@ -61,8 +67,11 @@ function install_prerequisites_rhel() {
 }
 
 function install_prerequisites_ubuntu() {
-    local pkgs="python3-minimal python3-distutils"
+    local pkgs=""
     which lsof || pkgs+=" lsof"
-    export DEBIAN_FRONTEND=noninteractive
-    sudo -E apt-get install -y $pkgs
-}
+    which python3 || pkgs+=" python3"
+    if [ -n "$pkgs" ] ; then
+        export DEBIAN_FRONTEND=noninteractive
+        sudo -E apt-get install -y $pkgs
+    fi
+} 
