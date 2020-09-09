@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
@@ -8,9 +9,17 @@ source "$my_dir/../common/functions.sh"
 export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
 export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"nexus.jenkins.progmaticlab.com/repository/"}
 export SSH_USER=${SSH_USER:-$(whoami)}
+ssh_opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 [ "$DISTRO" == "rhel" ] && export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
 
+if [ "$RHEL_VERSION" == "rhel8" ] ; then
+    source "$HOME/rhosp-environment.sh" || true
+    for ip in $(grep overcloud\.*ip "$HOME/rhosp-environment.sh" | cut -d "=" -f 2); do
+        ssh $ip "sudo ln -s $(which podman) /usr/bin/docker || true"
+        #ssh $ip "sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config"
+    done
+fi
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
     TF_TEST_IMAGE="contrail-test-test:${CONTRAIL_CONTAINER_TAG}"
@@ -60,6 +69,39 @@ sudo docker create --name $tmp_name $TF_TEST_IMAGE
 sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
 sudo docker rm $tmp_name
 
+# hack for tf-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf by default
+if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]]; then
+    echo "INFO: apply hack for kube config"
+    # this copy into /tmp/ is only required to let tf-test to copy it into its container, load and parse
+    # all calls to kubectl from tf-test will be done with default config on node
+    #
+    # ansible and kubespray deployments (k8s-manifests and helm) -
+    #   kubespray has /etc/kubernetes/admin.conf on each master
+    #   ansible has it just on one node - it can be any node from controller_nodes
+    #   tf-test walks through controller_nodes (node with role k8s_master) and can copy
+    #   this config from any node also. we have to set permissions for all
+    #
+    # juju has own way - config is in $HOME/.kube/config and only on worker nodes
+    #   master nodes works without config - with localhost:8080
+    #   to let tf-test to copy this config, load and parse let's copy it from worker to master
+    KUBE_CONFIG="/tmp/kube_config"
+    if [[ "$DEPLOYER" == 'juju' ]]; then
+        src_ip=$(echo $AGENT_NODES | awk '{print $1}')
+        dst_ip=$(echo $CONTROLLER_NODES | awk '{print $1}')
+        echo "INFO: juju branch copy from $src_ip/.kube/config to $dst_ip:$KUBE_CONFIG"
+        scp $ssl_opts $src_ip:.kube/config $dst_ip:$KUBE_CONFIG
+    else
+        config="/etc/kubernetes/admin.conf"
+        echo "INFO: ansible/kubespray branch - try to find config in $config"
+        for ip in ${CONTROLLER_NODES} ; do
+            echo "INFO: node $ip"
+            ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'ls -la /etc/kubernetes ; ls -la .kube'"
+            ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'cp -f $config $KUBE_CONFIG && chmod 644 $KUBE_CONFIG'" || /bin/true
+        done
+    fi
+    export KUBE_CONFIG
+fi
+
 # run tests:
 
 echo "INFO: prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
@@ -84,20 +126,16 @@ if [[ "${SSL_ENABLE,,}" == 'true' ]] ; then
     ssl_opts='-l /etc/contrail/ssl'
 fi
 
-# hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf
-# TODO: fix this in contrail-test
-if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]] ; then
-      if [[ ! -f /etc/kubernetes/admin.conf && -f ~/.kube/config ]] ; then
-        sudo mkdir -p /etc/kubernetes/
-        sudo cp ~/.kube/config /etc/kubernetes/admin.conf
-    fi
-    sudo chmod 644 /etc/kubernetes/admin.conf || /bin/true
-fi
-
 echo "INFO: run tests..."
 
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
-if HOME=$WORKSPACE ./testrunner.sh run \
+
+# if docker is a symlink of podman
+if readlink -f "$( which docker)" | grep -q "podman" ; then
+    use_host_networking='-H'
+fi
+
+if HOME=$WORKSPACE ./testrunner.sh run $use_host_networking \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     $ssl_opts \
