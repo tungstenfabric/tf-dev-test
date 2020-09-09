@@ -11,6 +11,13 @@ export SSH_USER=${SSH_USER:-$(whoami)}
 
 [ "$DISTRO" == "rhel" ] && export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
 
+# RHOSP16's 'docker --> podman' symlink for overcloud nodes
+if [ "$RHEL_VERSION" == "rhel8" ] ; then
+    source "$HOME/rhosp-environment.sh" || true
+    for ip in $(grep overcloud\.*ip "$HOME/rhosp-environment.sh" | cut -d "=" -f 2); do
+        ssh $ip "sudo ln -s $(which podman) /usr/bin/docker || true"
+    done
+fi
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
     TF_TEST_IMAGE="contrail-test-test:${CONTRAIL_CONTAINER_TAG}"
@@ -97,7 +104,13 @@ fi
 echo "INFO: run tests..."
 
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
-if HOME=$WORKSPACE ./testrunner.sh run \
+
+# podman, unlike docker, needs 'podman run's --network key in testrunner.sh
+#if readlink -f "$( which docker)" | grep -q "podman" ; then
+#    use_host_networking='-H'
+#fi
+
+if HOME=$WORKSPACE ./testrunner.sh run -H \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     $ssl_opts \
