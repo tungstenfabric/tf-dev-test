@@ -11,6 +11,15 @@ export SSH_USER=${SSH_USER:-$(whoami)}
 
 [ "$DISTRO" == "rhel" ] && export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
 
+if [ "$RHEL_VERSION" == "rhel8" ] ; then
+    #overcloud_env_file=$( [ -e "$HOME/rhosp-environment.sh" ] && echo "cat $HOME/rhosp-environment.sh" || echo "env" )
+    #overcloud_ips=$( $overcloud_env_file | grep "overcloud\.*ip" | cut -d "=" -f2)
+    #for overcloud_ip in $overcloud_ips; do
+    source "$HOME/rhosp-environment.sh" || true
+    for ip in $(grep overcloud\.*ip "$HOME/rhosp-environment.sh" | cut -d "=" -f 2); do
+        ssh $ip "sudo ln -s $(which podman) /usr/bin/docker || true"
+    done
+fi
 #
 if [ -z "$TF_TEST_IMAGE" ] ; then
     TF_TEST_IMAGE="contrail-test-test:${CONTRAIL_CONTAINER_TAG}"
@@ -54,7 +63,11 @@ fi
 
 # get testrunner.sh project
 echo "INFO: get testrunner.sh from image"
-sudo docker pull $TF_TEST_IMAGE
+if ! sudo docker pull $TF_TEST_IMAGE && [ "$OPENSTACK_VERSION" != 'queens' ]; then
+    TF_TEST_IMAGE=$(echo $TF_TEST_IMAGE | sed "s/$OPENSTACK_VERSION/queens/g")
+    OPENSTACK_VERSION='queens'
+    sudo docker pull $TF_TEST_IMAGE
+fi
 tmp_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 sudo docker create --name $tmp_name $TF_TEST_IMAGE
 sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
@@ -87,7 +100,7 @@ fi
 # hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf
 # TODO: fix this in contrail-test
 if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]] ; then
-      if [[ ! -f /etc/kubernetes/admin.conf && -f ~/.kube/config ]] ; then
+    if [[ ! -f /etc/kubernetes/admin.conf && -f ~/.kube/config ]] ; then
         sudo mkdir -p /etc/kubernetes/
         sudo cp ~/.kube/config /etc/kubernetes/admin.conf
     fi
@@ -97,7 +110,14 @@ fi
 echo "INFO: run tests..."
 
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
-if HOME=$WORKSPACE ./testrunner.sh run \
+
+use_host_networking=''
+# if docker is a symlink of podman
+if readlink -f "$( which docker)" | grep -q "podman" ; then
+    use_host_networking='-H'
+fi
+
+if HOME=$WORKSPACE ./testrunner.sh run $use_host_networking \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
     $ssl_opts \
