@@ -32,7 +32,6 @@ instances:
       openstack:
 {%- endif %}
 {%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
-      vrouter:
       k8s_master:
       kubemanager:
 {%- endif %}
