@@ -60,6 +60,19 @@ sudo docker create --name $tmp_name $TF_TEST_IMAGE
 sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
 sudo docker rm $tmp_name
 
+# hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf by default
+if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]]; then
+    if [[ -z "$KUBE_CONFIG" ]] ; then
+        KUBE_CONFIG="/etc/kubernetes/admin.conf"
+        if [[ ! -f "$KUBE_CONFIG" && -f "$HOME/.kube/config" ]] ; then
+            KUBE_CONFIG="$HOME/.kube/config"
+        fi
+    fi
+    sudo chmod 644 $KUBE_CONFIG || /bin/true
+    export KUBE_CONFIG
+    echo "INFO: kube config is $KUBE_CONFIG"
+fi
+
 # run tests:
 
 echo "INFO: prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
@@ -82,16 +95,6 @@ if [[ "${SSL_ENABLE,,}" == 'true' ]] ; then
         echo "$SSL_CACERT" | base64 -d -w 0 | sudo tee /etc/contrail/ssl/certs/ca-cert.pem > /dev/null
     fi
     ssl_opts='-l /etc/contrail/ssl'
-fi
-
-# hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf
-# TODO: fix this in contrail-test
-if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]] ; then
-      if [[ ! -f /etc/kubernetes/admin.conf && -f ~/.kube/config ]] ; then
-        sudo mkdir -p /etc/kubernetes/
-        sudo cp ~/.kube/config /etc/kubernetes/admin.conf
-    fi
-    sudo chmod 644 /etc/kubernetes/admin.conf || /bin/true
 fi
 
 echo "INFO: run tests..."
