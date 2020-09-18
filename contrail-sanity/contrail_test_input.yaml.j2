@@ -126,6 +126,9 @@ deployment:
 test_configuration:
     image_web_server: {{ IMAGE_WEB_SERVER }}
     use_project_scoped_token: True
+{%- if (ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all') and KUBE_CONFIG %}
+    kube_config_file: "{{ KUBE_CONFIG }}"
+{%- endif %}
 {%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
 {%- if AUTH_PORT %}
     auth_port: {{ AUTH_PORT }}
