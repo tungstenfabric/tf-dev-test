@@ -8,6 +8,7 @@ source "$my_dir/../common/functions.sh"
 export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
 export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"nexus.jenkins.progmaticlab.com/repository/"}
 export SSH_USER=${SSH_USER:-$(whoami)}
+ssh_opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 [ "$DISTRO" == "rhel" ] && export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
 
@@ -60,17 +61,37 @@ sudo docker create --name $tmp_name $TF_TEST_IMAGE
 sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
 sudo docker rm $tmp_name
 
-# hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf by default
+# hack for tf-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf by default
 if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]]; then
-    if [[ -z "$KUBE_CONFIG" ]] ; then
-        KUBE_CONFIG="/etc/kubernetes/admin.conf"
-        if [[ ! -f "$KUBE_CONFIG" && -f "$HOME/.kube/config" ]] ; then
-            KUBE_CONFIG="$HOME/.kube/config"
-        fi
+    echo "INFO: apply hack for kube config"
+    # this copy into /tmp/ is only required to let tf-test to copy it into its container, load and parse
+    # all calls to kubectl from tf-test will be done with default config on node
+    #
+    # ansible and kubespray deployments (k8s-manifests and helm) -
+    #   kubespray has /etc/kubernetes/admin.conf on each master
+    #   ansible has it just on one node - it can be any node from controller_nodes
+    #   tf-test walks through controller_nodes (node with role k8s_master) and can copy
+    #   this config from any node also. we have to set permissions for all
+    #
+    # juju has own way - config is in $HOME/.kube/config and only on worker nodes
+    #   master nodes works without config - with localhost:8080
+    #   to let tf-test to copy this config, load and parse let's copy it from worker to master
+    KUBE_CONFIG="/tmp/kube_config"
+    if [[ "$DEPLOYER" == 'juju' ]]; then
+        src_ip=$(echo $AGENT_NODES | awk '{print $1}')
+        dst_ip=$(echo $CONTROLLER_NODES | awk '{print $1}')
+        echo "INFO: juju branch copy from $src_ip/.kube/config to $dst_ip:$KUBE_CONFIG"
+        scp $ssl_opts $src_ip:.kube/config $dst_ip:$KUBE_CONFIG
+    else
+        config="/etc/kubernetes/admin.conf"
+        echo "INFO: ansible/kubespray branch - try to find config in $config"
+        for ip in ${CONTROLLER_NODES} ; do
+            echo "INFO: node $ip"
+            ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'ls -la /etc/kubernetes ; ls -la .kube'"
+            ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'cp -f $config $KUBE_CONFIG && chmod 644 $KUBE_CONFIG'" || /bin/true
+        done
     fi
-    sudo chmod 644 $KUBE_CONFIG || /bin/true
     export KUBE_CONFIG
-    echo "INFO: kube config is $KUBE_CONFIG"
 fi
 
 # run tests:
