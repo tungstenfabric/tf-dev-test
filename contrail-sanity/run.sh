@@ -60,6 +60,13 @@ sudo docker create --name $tmp_name $TF_TEST_IMAGE
 sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
 sudo docker rm $tmp_name
 
+for vm in ${CONTROLLER_NODES} ${AGENT_NODES} ; do
+    ssh $vm sudo ls /etc/kubernetes/ || /bin/true
+    ssh $vm sudo cat /etc/kubernetes/admin.conf || /bin/true
+    ssh $vm sudo ls .kube/ || /bin/true
+    ssh $vm sudo cat .kube/config || /bin/true
+fi
+
 # hack for contrail-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf by default
 if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]]; then
     if [[ -z "$KUBE_CONFIG" ]] ; then
