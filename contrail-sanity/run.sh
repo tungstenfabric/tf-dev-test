@@ -87,7 +87,7 @@ if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]]; then
         echo "INFO: ansible/kubespray branch - try to find config in $config"
         for ip in ${CONTROLLER_NODES} ; do
             echo "INFO: node $ip"
-            ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'ls -la /etc/kubernetes ; ls -la .kube'"
+            ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'ls -la /etc/kubernetes ; ls -la .kube'" || /bin/true
             ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'cp -f $config $KUBE_CONFIG && chmod 644 $KUBE_CONFIG'" || /bin/true
         done
     fi
