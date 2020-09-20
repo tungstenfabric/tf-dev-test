@@ -80,14 +80,14 @@ if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]]; then
     if [[ "$DEPLOYER" == 'juju' ]]; then
         src_ip=$(echo $AGENT_NODES | awk '{print $1}')
         dst_ip=$(echo $CONTROLLER_NODES | awk '{print $1}')
-        echo "INFO: juju branch copy from $src_ip/.kube/config to $dst_ip:$KUBE_CONFIG"
-        scp $ssl_opts $src_ip:.kube/config $dst_ip:$KUBE_CONFIG
+        echo "INFO: juju branch. copy from $src_ip/.kube/config to $dst_ip:$KUBE_CONFIG"
+        scp $ssl_opts $SSH_USER@$src_ip:.kube/config $SSH_USER@$dst_ip:$KUBE_CONFIG
     else
         config="/etc/kubernetes/admin.conf"
         echo "INFO: ansible/kubespray branch - try to find config in $config"
         for ip in ${CONTROLLER_NODES} ; do
             echo "INFO: node $ip"
-            ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'ls -la /etc/kubernetes ; ls -la .kube'"
+            ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'ls -la /etc/kubernetes ; ls -la .kube'" || /bin/true
             ssh $ssh_opts $SSH_USER@$ip "sudo bash -cx 'cp -f $config $KUBE_CONFIG && chmod 644 $KUBE_CONFIG'" || /bin/true
         done
     fi
