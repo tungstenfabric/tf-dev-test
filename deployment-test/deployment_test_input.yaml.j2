@@ -1,0 +1,146 @@
+{%- if CONTROLLER_NODES is defined and CONTROLLER_NODES|length %}
+{%- set CONTROLLER_NODES = CONTROLLER_NODES.split() %}
+{%- endif %}
+{%- if AGENT_NODES is defined and AGENT_NODES|length %}
+{%- set AGENT_NODES = AGENT_NODES.split() %}
+{%- endif %}
+{%- if OPENSTACK_CONTROLLER_NODES is defined and OPENSTACK_CONTROLLER_NODES|length %}
+{%- set OPENSTACK_CONTROLLER_NODES = OPENSTACK_CONTROLLER_NODES.split() %}
+{%- endif -%}
+provider_config:
+  bms:
+    ssh_user: "{{ SSH_USER }}"
+    ssh_pwd:
+    domainsuffix: "{{ DOMAINSUFFIX }}"
+
+instances:
+{%- for node in CONTROLLER_NODES %}
+  {{ node | replace(".", "_") }}:
+    ip: {{ node }}
+    provider: bms
+    roles:
+      analytics:
+      analytics_snmp:
+      analytics_alarm:
+      analytics_database:
+      config:
+      config_database:
+      control:
+      webui:
+{%- if (ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all') and
+       (OPENSTACK_CONTROLLER_NODES is undefined or OPENSTACK_CONTROLLER_NODES|length == 0 or node in OPENSTACK_CONTROLLER_NODES) %}
+      openstack:
+{%- endif %}
+{%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
+      k8s_master:
+      kubemanager:
+{%- endif %}
+{%- if node in AGENT_NODES %}
+      vrouter:
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+      openstack_compute:
+{%- endif %}
+{%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
+      k8s_node:
+{%- endif %}
+{%- endif %}
+{%- endfor %}
+{%- if AGENT_NODES is defined and AGENT_NODES|length %}
+{%- for node in AGENT_NODES %}
+{%- if node not in CONTROLLER_NODES %}
+  {{ node | replace(".", "_") }}:
+    ip: {{ node }}
+    provider: bms
+    roles:
+      vrouter:
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+      openstack_compute:
+{%- endif %}
+{%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
+      k8s_node:
+{%- endif %}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+
+{%- if OPENSTACK_CONTROLLER_NODES is defined and OPENSTACK_CONTROLLER_NODES|length %}
+{%- for node in OPENSTACK_CONTROLLER_NODES %}
+{%- if node not in CONTROLLER_NODES and node not in AGENT_NODES %}
+  {{ node | replace(".", "_") }}:
+    ip: {{ node }}
+    provider: bms
+    roles:
+      openstack:
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+
+contrail_configuration:
+  LOG_LEVEL: SYS_DEBUG
+  CONTRAIL_CONTAINER_TAG: {{ CONTRAIL_CONTAINER_TAG }}
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+  CLOUD_ORCHESTRATOR: openstack
+  OPENSTACK_VERSION: {{ OPENSTACK_VERSION }}
+  AUTH_MODE: keystone
+  KEYSTONE_AUTH_URL_VERSION: /v3
+{%- endif %}
+{%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all' %}
+  KUBERNETES_PUBLIC_FIP_POOL:
+     domain: default-domain
+     name: __fip_pool_public__
+     network: __public__
+     project: k8s-default
+{%- endif %}
+{%- if SSL_ENABLE == 'true' %}
+  # contrail-test check flag existense and doesn't check the value
+  SSL_ENABLE: "{{ SSL_ENABLE }}"
+  RABBITMQ_USE_SSL: "{{ SSL_ENABLE }}"
+  CASSANDRA_SSL_ENABLE: "{{ SSL_ENABLE }}"
+{%- endif %}
+
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+orchestrator_configuration:
+  keystone:
+    version: v3
+    password: {{ AUTH_PASSWORD }}
+{%- if AUTH_DOMAIN %}
+    domain: {{ AUTH_DOMAIN }}
+{%- endif %}
+{%- if AUTH_REGION %}
+    region: {{ AUTH_REGION }}
+{%- endif %}
+{%- endif %}
+
+deployment:
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+    orchestrator: openstack
+{%- else %}
+    orchestrator: kubernetes
+{%- endif %}
+{%- if DEPLOYER == 'ansible' %}
+    deployer: contrail-ansible-deployer
+{%- else %}
+    deployer: {{ DEPLOYER }}
+{%- endif %}
+
+test_configuration:
+    image_web_server: {{ IMAGE_WEB_SERVER }}
+    use_project_scoped_token: True
+{%- if (ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'all') and KUBE_CONFIG %}
+    kube_config_file: "{{ KUBE_CONFIG }}"
+{%- endif %}
+{%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
+{%- if AUTH_PORT %}
+    auth_port: {{ AUTH_PORT }}
+{%- endif %}
+{%- if AUTH_URL %}
+{%- if 'v3' in AUTH_URL %}
+    auth_url: {{ AUTH_URL }}
+{%- else %}
+    auth_url: {{ AUTH_URL }}/v3
+{%- endif %}
+{%- endif %}
+{%- if AUTH_DOMAIN %}
+    test_domain: {{ AUTH_DOMAIN }}
+{%- endif %}
+{%- endif %}
