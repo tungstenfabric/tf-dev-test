@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6f334a87_9e193e80",
+        "filename": "deployment-test/run.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-09-28T15:44:21Z",
+      "side": 1,
+      "message": "let\u0027s change this bad practice )\njust\n\nHOME\u003d$WORKSPACE ./testrunner.sh",
+      "revId": "8c90d5aa63e50e9842aae86c040d21fa81fcc922",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
