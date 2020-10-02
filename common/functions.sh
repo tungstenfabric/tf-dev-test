@@ -1,5 +1,18 @@
 #!/bin/bash
 
+function retry() {
+    local i
+    for ((i=0; i<5; ++i)) ; do
+        if $@ ; then
+            break
+        fi
+        sleep 5
+    done
+    if [[ $i == 5 ]]; then
+        return 1
+    fi
+}
+
 function wait_cmd_success() {
     local cmd=$1
     local interval=${2:-3}
@@ -66,5 +79,5 @@ function install_prerequisites_ubuntu() {
     local pkgs="python3-minimal python3-distutils"
     which lsof || pkgs+=" lsof"
     export DEBIAN_FRONTEND=noninteractive
-    sudo -E apt-get install -y $pkgs
+    retry sudo -E apt-get install -y $pkgs
 }

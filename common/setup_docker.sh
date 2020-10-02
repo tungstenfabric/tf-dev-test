@@ -6,18 +6,6 @@ source ${scriptdir}/functions.sh
 
 ### basic functions
 
-function retry() {
-    local i
-    for ((i=0; i<5; ++i)) ; do
-        if $@ ; then
-            break
-        fi
-        sleep 5
-    done
-    if [[ $i == 5 ]]; then
-        return 1
-    fi
-}
 function is_registry_insecure() {
     echo "DEBUG: is_registry_insecure: $@"
     local registry=`echo $1 | sed 's|^.*://||' | cut -d '/' -f 1`
@@ -35,7 +23,7 @@ function install_docker_ubuntu() {
     export DEBIAN_FRONTEND=noninteractive
     retry apt-get update
     retry apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
     add-apt-repository -y -u "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     retry apt-get install -y "docker-ce=18.06.3~ce~3-0~ubuntu"
 }
@@ -50,10 +38,11 @@ function install_docker_centos() {
 
 function install_docker_rhel() {
     if [ "$RHEL_VERSION" != "rhel8" ]; then
-        sudo yum install -y docker device-mapper-libs device-mapper-event-libs
+        yum install -y docker device-mapper-libs device-mapper-event-libs
     else
-        sudo yum install -y podman device-mapper-libs device-mapper-event-libs
-        sudo ln -s "$(which podman)" /usr/bin/docker
+        yum install -y podman device-mapper-libs device-mapper-event-libs
+        # NOTE: HACK! make symlink 'docker' while tf-test uses it
+        ln -s "$(which podman)" /usr/bin/docker
     fi
 }
 
@@ -64,16 +53,16 @@ function configure_insecure_registries_containers() {
     echo "INFO: old registries are $insecure_registries"
     insecure_registries="registries =[$insecure_registries, '$1']"
     echo "INFO: new registries are $insecure_registries"
-    sudo sed -i "/registries.insecure/{n; s/registries = .*$/${insecure_registries}/g}" ${DOCKER_CONFIG}
+    sed -i "/registries.insecure/{n; s/registries = .*$/${insecure_registries}/g}" ${DOCKER_CONFIG}
 }
 
 function configure_insecure_registries_sysconfig() {
     echo "INFO: add REGISTRY=$1 to insecure list"
     local insecure_registries=$(cat /etc/sysconfig/docker | awk -F '=' '/^INSECURE_REGISTRY=/{print($2)}' | tr -d '"')
     insecure_registries+=" --insecure-registry $1"
-    sudo sed -i '/^INSECURE_REGISTRY/d' "$DOCKER_CONFIG"
-    echo "INSECURE_REGISTRY=\"$insecure_registries\""  | sudo tee -a "$DOCKER_CONFIG"
-    sudo cat "$DOCKER_CONFIG"
+    sed -i '/^INSECURE_REGISTRY/d' "$DOCKER_CONFIG"
+    echo "INSECURE_REGISTRY=\"$insecure_registries\"" >> "$DOCKER_CONFIG"
+    cat "$DOCKER_CONFIG"
 }
 
 function configure_insecure_registries_docker() {
