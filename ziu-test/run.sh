@@ -65,3 +65,7 @@ while true; do
   fi
   sleep 10
 done
+
+# to wait while all agents come back and show active state (otherwise we catch sometimes NTP state unsynchronised) 
+# TODO: change to something like wait_for_active
+sleep 120
