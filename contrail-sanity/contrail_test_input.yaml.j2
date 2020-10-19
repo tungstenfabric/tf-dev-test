@@ -7,6 +7,9 @@
 {%- if OPENSTACK_CONTROLLER_NODES is defined and OPENSTACK_CONTROLLER_NODES|length %}
 {%- set OPENSTACK_CONTROLLER_NODES = OPENSTACK_CONTROLLER_NODES.split() %}
 {%- endif -%}
+{%- if DPDK_AGENT_NODES is defined and DPDK_AGENT_NODES|length %}
+{%- set DPDK_AGENT_NODES = DPDK_AGENT_NODES.split() %}
+{%- endif -%}
 provider_config:
   bms:
     ssh_user: "{{ SSH_USER }}"
@@ -53,6 +56,9 @@ instances:
     provider: bms
     roles:
       vrouter:
+{%- if node in DPDK_AGENT_NODES %}
+        AGENT_MODE: dpdk
+{%- endif %}
 {%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
       openstack_compute:
 {%- endif %}
