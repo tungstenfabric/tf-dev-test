@@ -22,6 +22,30 @@
       "revId": "a9e02db6b45c3306887e64edc12802b90cc8b822",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "503c3b6e_730d528f",
+        "filename": "contrail-sanity/contrail_test_input.yaml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 471
+      },
+      "writtenOn": "2020-10-20T20:39:10Z",
+      "side": 1,
+      "message": "fixed",
+      "parentUuid": "eefe40e8_44e4e858",
+      "range": {
+        "startLine": 59,
+        "startChar": 31,
+        "endLine": 59,
+        "endChar": 32
+      },
+      "revId": "a9e02db6b45c3306887e64edc12802b90cc8b822",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
