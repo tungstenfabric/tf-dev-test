@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eefe40e8_44e4e858",
+        "filename": "contrail-sanity/contrail_test_input.yaml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 437
+      },
+      "writtenOn": "2020-10-20T15:49:34Z",
+      "side": 1,
+      "message": "space before %",
+      "range": {
+        "startLine": 59,
+        "startChar": 31,
+        "endLine": 59,
+        "endChar": 32
+      },
+      "revId": "a9e02db6b45c3306887e64edc12802b90cc8b822",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
