@@ -23,9 +23,11 @@ instances:
     provider: bms
     roles:
       analytics:
+{%- if (LEGACY_ANALYTICS_ENABLE | lower) == 'true' %}
       analytics_snmp:
       analytics_alarm:
       analytics_database:
+{%- endif %}
       config:
       config_database:
       control:
@@ -103,6 +105,9 @@ contrail_configuration:
   RABBITMQ_USE_SSL: "{{ SSL_ENABLE }}"
   CASSANDRA_SSL_ENABLE: "{{ SSL_ENABLE }}"
 {%- endif %}
+  ANALYTICSDB_ENABLE: "{{ LEGACY_ANALYTICS_ENABLE }}"
+  ANALYTICS_ALARM_ENABLE: "{{ LEGACY_ANALYTICS_ENABLE }}"
+  ANALYTICS_SNMP_ENABLE: "{{ LEGACY_ANALYTICS_ENABLE }}"
 
 {%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
 orchestrator_configuration:
