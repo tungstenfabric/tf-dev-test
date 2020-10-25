@@ -40,6 +40,8 @@ juju config contrail-openstack image-tag=$CONTRAIL_CONTAINER_TAG docker-registry
 juju config contrail-controller image-tag=$CONTRAIL_CONTAINER_TAG docker-registry=$CONTAINER_REGISTRY
 
 wait_cmd_success 20 540 "ziu_status \"ziu is in progress - stage\/done = 5\/5\""
+# wait a bit when all agents consume stage 5
+sleep 60
 
 for agent in $(juju status | grep -o "contrail-agent/[0-9]*"); do
     juju run-action --wait $agent upgrade
