@@ -15,7 +15,7 @@ ssh_opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 # RHOSP16's 'docker --> podman' symlink for overcloud nodes
 if [ "$RHEL_VERSION" == "rhel8" ] ; then
     source "$HOME/rhosp-environment.sh" || true
-    for ip in $(grep overcloud\.*ip "$HOME/rhosp-environment.sh" | cut -d "=" -f 2); do
+    for ip in $(grep overcloud\.*ip "$HOME/rhosp-environment.sh" | cut -d "=" -f 2 | tr -d '"'''); do
         ssh $ip "sudo yum install -y podman-docker && sudo touch /etc/containers/nodocker"
     done
 fi
