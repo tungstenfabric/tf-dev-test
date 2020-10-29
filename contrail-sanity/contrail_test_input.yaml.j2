@@ -109,8 +109,8 @@ contrail_configuration:
   ANALYTICS_ALARM_ENABLE: "{{ LEGACY_ANALYTICS_ENABLE }}"
   ANALYTICS_SNMP_ENABLE: "{{ LEGACY_ANALYTICS_ENABLE }}"
   CONTROLLER_NODES: "{{ CONTROLLER_NODES | join(',') }}"
-{%- if CONTROL_NODES %}
-  CONTROL_NODES: "{{ CONTROL_NODES }}"
+{%- if CONTROL_NODES is defined and CONTROL_NODES|length  %}
+  CONTROL_NODES: "{{ CONTROL_NODES | join(',') }}"
 {%- endif %}
 
 {%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'all' %}
