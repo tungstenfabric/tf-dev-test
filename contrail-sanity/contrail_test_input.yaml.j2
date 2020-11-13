@@ -132,6 +132,9 @@ deployment:
 {%- else %}
     orchestrator: kubernetes
 {%- endif %}
+{%- if ORCHESTRATOR == 'all' %}
+    additional_orchestrator: kubernetes
+{%- endif %}
 {%- if DEPLOYER == 'ansible' %}
     deployer: contrail-ansible-deployer
 {%- else %}
