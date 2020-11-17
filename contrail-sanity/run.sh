@@ -68,7 +68,7 @@ sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
 sudo docker rm $tmp_name
 
 # hack for tf-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf by default
-if [[ ${TF_TEST_TARGET} == "ci_k8s_sanity" ]]; then
+if [[ ${TF_TEST_TARGET} == *"ci_k8s_sanity"* ]]; then
     echo "INFO: apply hack for kube config"
     # this copy into /tmp/ is only required to let tf-test to copy it into its container, load and parse
     # all calls to kubectl from tf-test will be done with default config on node
