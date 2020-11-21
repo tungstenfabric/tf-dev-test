@@ -128,6 +128,7 @@ fi
 echo "INFO: run tests..."
 
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
+res=0
 if HOME=$WORKSPACE ./testrunner.sh run -H \
     -P ./contrail_test_input.yaml \
     -k ~/.ssh/id_rsa \
@@ -142,6 +143,14 @@ else
     if [[ x"$test_failures" != x'failures="0"' ]]; then
         echo "ERROR: there were failures during the test."
         echo "       See detailed logs in ${WORKSPACE}/contrail-test-runs"
-        exit 1
+        res=1
     fi
 fi
+
+echo "INFO: collect logs"
+testdir=$(ls -1 contrail-test-runs | sort | tail -1)
+pushd contrail-test-runs/$testdir
+tar -czvf $WORKSPACE/logs.tgz reports/* logs
+popd
+
+exit $res
