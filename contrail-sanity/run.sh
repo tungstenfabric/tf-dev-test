@@ -152,9 +152,10 @@ fi
 echo "INFO: collect logs"
 testdir=$(ls -1 contrail-test-runs | sort | tail -1)
 pushd contrail-test-runs/$testdir
-tar -czvf $WORKSPACE/logs.tgz logs
+tar -cvf $WORKSPACE/logs.tar logs
 cd reports
-tar -rzvf $WORKSPACE/logs.tgz *
+tar -rvf $WORKSPACE/logs.tar *
 popd
+gzip $WORKSPACE/logs.tar
 
 exit $res
