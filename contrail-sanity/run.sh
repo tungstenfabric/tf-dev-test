@@ -5,6 +5,8 @@ my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
 source "$my_dir/../common/functions.sh"
 
+rm -f $WORKSPACE/logs.tgz
+
 export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
 export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"tf-nexus.progmaticlab.com/repository/"}
 export SSH_USER=${SSH_USER:-$(whoami)}
