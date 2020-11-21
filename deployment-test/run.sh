@@ -4,7 +4,7 @@ my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
 
-rm -f $WORKSPACE/logs.tgz
+rm -f $WORKSPACE/logs.tgz || /bin/true
 
 if [ -z "$TF_TEST_IMAGE" ] ; then
     TF_TEST_IMAGE="tf-deployment-test:${CONTRAIL_CONTAINER_TAG}"
