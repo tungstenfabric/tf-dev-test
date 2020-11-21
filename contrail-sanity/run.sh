@@ -157,5 +157,6 @@ cd reports
 tar -rvf $WORKSPACE/logs.tar *
 popd
 gzip $WORKSPACE/logs.tar
+mv $WORKSPACE/logs.tar.gz $WORKSPACE/logs.tgz
 
 exit $res
