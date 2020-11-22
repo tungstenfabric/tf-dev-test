@@ -150,13 +150,24 @@ else
 fi
 
 echo "INFO: collect logs"
-testdir=$(ls -1 contrail-test-runs | sort | tail -1)
-pushd contrail-test-runs/$testdir
-tar -cvf $WORKSPACE/logs.tar logs
-cd reports
-tar -rvf $WORKSPACE/logs.tar *
-popd
-gzip $WORKSPACE/logs.tar
-mv $WORKSPACE/logs.tar.gz $WORKSPACE/logs.tgz
+set +e
+if [ -d contrail-test-runs ]; then
+    testdir=$(ls -1 contrail-test-runs | sort | tail -1)
+    if [[ -n "$testdir" && -d "contrail-test-runs/$testdir" ]]; then
+        pushd contrail-test-runs/$testdir
+        tar -cvf $WORKSPACE/logs.tar logs
+        cd reports
+        tar -rvf $WORKSPACE/logs.tar *
+        popd
+        gzip $WORKSPACE/logs.tar
+        mv $WORKSPACE/logs.tar.gz $WORKSPACE/logs.tgz
+    else
+        echo "WARNING: content is absent in folder contrail-test-runs"
+        ls -l contrail-test-runs
+    fi
+else
+    echo "WARNING: folder contrail-test-runs is absent"
+    ls -l
+fi
 
 exit $res
