@@ -24,7 +24,11 @@ cd $WORKSPACE
 
 # get testrunner.sh project
 echo "INFO: get testrunner.sh from image"
-sudo docker pull $TF_TEST_IMAGE
+if ! sudo docker pull $TF_TEST_IMAGE ; then
+  echo "INFO: looks like deployment-test container was not built due to old release. Skipping tests..."
+  exit
+fi
+
 tmp_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 sudo docker create --name $tmp_name $TF_TEST_IMAGE
 sudo docker cp $tmp_name:/testrunner.sh ./testrunner.sh
