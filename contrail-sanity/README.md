@@ -18,3 +18,4 @@ DEPLOYER - how the setup was deployed. with ansible-deployer, helm-deployer, juj
 OPENSTACK_VERSION - queens, rocky, stein, train, …
 AUTH_PASSWORD, AUTH_DOMAIN, AUTH_REGION, AUTH_URL, AUTH_PORT - keystone params if present
 DOMAINSUFFIX - domain of deployment (useful in helm)
+TF_DEPLOYMENT_TEST_IMAGE - full id of deployment-test image is it's not equal to CONTAINER_REGISTRY, CONTRAIL_CONTAINER_TAG (registry, name, tag)
