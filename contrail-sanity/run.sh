@@ -42,7 +42,7 @@ k8s_target='ci_k8s_sanity'
 if [[ "$DEPLOYER" == 'openshift' ]] ; then
   k8s_target='ci_openshift'
 fi
-declare -A default_targets=(['kubernetes']="$k8s_target" ['openstack']='ci_sanity' ['all']="ci_sanity,${k8s_target}")
+declare -A default_targets=(['kubernetes']="$k8s_target" ['openstack']='ci_sanity' ['hybrid']="ci_sanity,${k8s_target}")
 TF_TEST_TARGET=${TF_TEST_TARGET:-${default_targets[$ORCHESTRATOR]}}
 if [[ -z "$TF_TEST_TARGET" ]]; then
     echo "ERROR: please provide either ORCHESTRATOR or TF_TEST_TARGET"

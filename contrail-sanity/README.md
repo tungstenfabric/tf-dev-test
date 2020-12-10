@@ -4,7 +4,7 @@ It runs the corresponding to the orchestrator test suit from [contrail-test](htt
 
 # Environment parameters
 
-ORCHESTRATOR - can be one of 'openstack', 'kubernetes', 'all'
+ORCHESTRATOR - can be one of 'openstack', 'kubernetes', 'hybrid'
 CONTROLLER_NODES - it’s a list of comma separated IP-s of control plane (contrail, openstack, kubernetes). for now tf-dev-test support only configurations where all components of control plane (contrail, openstack, kubernetes) are placed one same machines (for example "IP1,IP2,IP3")
 AGENT_NODES - it’s a list of comma separated IP-s of agent nodes (compute, kubernetes worker). Same comment is here - there is no possibility to specify different nodes for computes and kubernetes.
 SSH_USER - user to access remote nodes (current user by default)
