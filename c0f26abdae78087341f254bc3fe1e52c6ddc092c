@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aea4ed2d_6f6be65a",
+        "filename": "contrail-sanity/contrail_test_input.yaml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 437
+      },
+      "writtenOn": "2020-12-11T11:38:03Z",
+      "side": 1,
+      "message": "a bit strange as this is already inside a node...\n\nmight it be that it is a separate section at top level?\nformed like\n{% for node in SRIOV_AGENT_NODES %}\nsriov_data:\n  heat-admin@{{ node }}:\n....\n{% endfor %}",
+      "range": {
+        "startLine": 66,
+        "startChar": 10,
+        "endLine": 66,
+        "endChar": 32
+      },
+      "revId": "c0f26abdae78087341f254bc3fe1e52c6ddc092c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
