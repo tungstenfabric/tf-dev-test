@@ -10,6 +10,9 @@
 {%- if DPDK_AGENT_NODES is defined and DPDK_AGENT_NODES|length %}
 {%- set DPDK_AGENT_NODES = DPDK_AGENT_NODES.split() %}
 {%- endif -%}
+{%- if SRIOV_AGENT_NODES is defined and SRIOV_AGENT_NODES|length %}
+{%- set SRIOV_AGENT_NODES = SRIOV_AGENT_NODES.split() %}
+{%- endif -%}
 provider_config:
   bms:
     ssh_user: "{{ SSH_USER }}"
@@ -58,6 +61,13 @@ instances:
     provider: bms
     roles:
       vrouter:
+{%- if node in SRIOV_AGENT_NODES %}
+        sriov_data:
+          {{ SSH_USER }}@{{ node }}:
+            - physnets: ['{{ SRIOV_PHYSICAL_NETWORK }}']
+              interface: ['{{ SRIOV_PHYSICAL_INTERFACE }}']
+              VF: {{ SRIOV_VF_NUMBER }}
+{%- endif %}
 {%- if node in DPDK_AGENT_NODES %}
         AGENT_MODE: dpdk
 {%- endif %}
