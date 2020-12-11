@@ -162,3 +162,17 @@ test_configuration:
     test_domain: {{ AUTH_DOMAIN }}
 {%- endif %}
 {%- endif %}
+{%- if SRIOV_CONFIGURATION is defined and SRIOV_CONFIGURATION|length %}
+{%- set SRIOV_CONFIGURATION_ITEMS = SRIOV_CONFIGURATION.split(';') %}
+
+#Special data-structure for tf-test/serial/sriov/*
+sriov_configuration:
+{%- for item in SRIOV_CONFIGURATION_ITEMS %}
+{%- set node, physnets, interface, vf = item.split(':') %}
+  {{ SSH_USER }}@{{ node }}:
+    - physnets: ['{{ physnets }}']
+      interface: ['{{ interface }}']
+      VF: {{ vf }}
+{%- endfor %}
+{%- endif -%}
+
