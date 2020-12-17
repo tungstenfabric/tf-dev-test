@@ -47,6 +47,6 @@ for agent in $(juju status | grep -o "contrail-agent/[0-9]*"); do
     juju run-action --wait $agent upgrade
 done
 
-wait_cmd_success 20 30 "juju status | grep -q \"ziu\""
-wait_cmd_success 50 36 "juju status | grep -q \"waiting\|blocked\|maintenance\|unknown\""
+wait_cmd_success 20 40 "juju status | grep -q \"ziu\""
+wait_cmd_success 60 40 "juju status | grep -q \"waiting\|blocked\|maintenance\|unknown\""
 
