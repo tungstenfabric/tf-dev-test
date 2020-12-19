@@ -109,9 +109,31 @@ contrail_configuration:
   ANALYTICS_ALARM_ENABLE: "{{ LEGACY_ANALYTICS_ENABLE }}"
   ANALYTICS_SNMP_ENABLE: "{{ LEGACY_ANALYTICS_ENABLE }}"
   CONTROLLER_NODES: "{{ CONTROLLER_NODES | join(',') }}"
+# Network isolation case.
+# services might be on different IPs,
+# but list of nodes is still in CONTROLLER_NODES
 {%- if CONTROL_NODES is defined and CONTROL_NODES|length  %}
   CONTROL_NODES: "{{ CONTROL_NODES.split(' ') | join(',') }}"
 {%- endif %}
+{%- if CONFIG_NODES is defined and CONFIG_NODES|length  %}
+  CONFIG_NODES: "{{ CONFIG_NODES.split(' ') | join(',') }}"
+{%- endif %}
+{%- if ANALYTICS_NODES is defined and ANALYTICS_NODES|length  %}
+  ANALYTICS_NODES: "{{ ANALYTICS_NODES.split(' ') | join(',') }}"
+{%- endif %}
+{%- if ANALYTICSDB_NODES is defined and ANALYTICSDB_NODES|length  %}
+  ANALYTICSDB_NODES: "{{ ANALYTICSDB_NODES.split(' ') | join(',') }}"
+{%- endif %}
+{%- if WEBUI_NODES is defined and WEBUI_NODES|length  %}
+  WEBUI_NODES: "{{ WEBUI_NODES.split(' ') | join(',') }}"
+{%- endif %}
+{%- if CONFIG_API_VIP is defined and CONFIG_API_VIP|length  %}
+  CONFIG_API_VIP: "{{ CONFIG_API_VIP }}"
+{%- endif %}
+{%- if ANALYTICS_API_VIP is defined and ANALYTICS_API_VIP|length  %}
+  ANALYTICS_API_VIP: "{{ ANALYTICS_API_VIP }}"
+{%- endif %}
+
 
 {%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'hybrid' %}
 orchestrator_configuration:
