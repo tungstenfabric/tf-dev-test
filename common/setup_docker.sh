@@ -42,7 +42,7 @@ function install_docker_rhel() {
     else
         yum install -y podman device-mapper-libs device-mapper-event-libs
         # NOTE: HACK! make symlink 'docker' while tf-test uses it
-        ln -s "$(which podman)" /usr/bin/docker
+        yum install -y podman-docker && sudo touch /etc/containers/nodocker
     fi
 }
 

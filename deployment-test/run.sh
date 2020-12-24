@@ -17,6 +17,8 @@ else
     export CONTAINER_REGISTRY="$(echo $TF_DEPLOYMENT_TEST_IMAGE | cut -d '/' -f 1)"
 fi
 
+[ "$DISTRO" == "rhel" ] && export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
+
 # prepare env
 sudo -E $my_dir/../common/setup_docker.sh
 
