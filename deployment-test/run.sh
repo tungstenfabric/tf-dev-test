@@ -3,6 +3,7 @@
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
 source "$my_dir/../common/common.sh"
+source "$my_dir/../common/functions.sh"
 
 rm -f $WORKSPACE/logs.tgz || /bin/true
 
@@ -16,6 +17,8 @@ else
     # as insecure registry and will not be added to docker's config
     export CONTAINER_REGISTRY="$(echo $TF_DEPLOYMENT_TEST_IMAGE | cut -d '/' -f 1)"
 fi
+
+install_prerequisites_$DISTRO
 
 # prepare env
 sudo -E $my_dir/../common/setup_docker.sh
