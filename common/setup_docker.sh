@@ -143,8 +143,11 @@ configure_insecure_registries_$(echo "$DOCKER_CONFIG" | cut -d "/" -f3 ) "$CONTA
 echo ""
 echo "INFO: [restart docker]"
 
+
+
+
 if [ x"$DISTRO" == x"centos" -o x"$DISTRO" == x"rhel" ] ; then
-    systemctl restart docker
+    [ "$RHEL_VERSION" == "rhel8" ] || systemctl restart docker
 elif [ x"$DISTRO" == x"ubuntu" ]; then
     service docker reload
 else
