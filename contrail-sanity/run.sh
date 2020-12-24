@@ -12,8 +12,6 @@ export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"tf-nexus.progmaticlab.com/repository
 export SSH_USER=${SSH_USER:-$(whoami)}
 export ssh_opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no"
 
-[ "$DISTRO" == "rhel" ] && export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
-
 # RHOSP16's 'docker --> podman' symlink for overcloud nodes
 if [ "$RHEL_VERSION" == "rhel8" ] ; then
     for ip in $(echo "$CONTROLLER_NODES $AGENT_NODES $OPENSTACK_CONTROLLER_NODES" | sort -u) ; do
