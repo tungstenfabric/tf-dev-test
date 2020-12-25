@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1639022c_a5e64e19",
+        "filename": "common/common.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 437
+      },
+      "writtenOn": "2020-12-25T08:21:01Z",
+      "side": 1,
+      "message": "i would rewrite it like\n[[ \"$DISTRO\" !\u003d \"rhel\" ]] || ...\nreason is when distro is not rhel the whole line is failed that might cause issues in case if -e in bash",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 27
+      },
+      "revId": "ff4a9b528d210b07e348387d6c71a752d3bf65ee",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
