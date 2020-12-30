@@ -193,7 +193,7 @@ sriov_configuration:
 {%- set node, physnets, interface, vf = item.split(':') %}
   {{ SSH_USER }}@{{ node }}:
     - physnets: ['{{ physnets }}']
-      interface: ['{{ interface }}']
+      interface: '{{ interface }}'
       VF: {{ vf }}
 {%- endfor %}
 {%- endif -%}
