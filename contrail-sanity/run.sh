@@ -37,7 +37,7 @@ install_prerequisites_$DISTRO
 sudo -E $my_dir/../common/setup_docker.sh
 
 k8s_target='ci_k8s_sanity'
-if [[ "$DEPLOYER" == 'openshift' ]] ; then
+if [[ "$DEPLOYER" == 'openshift3' ]] ; then
   k8s_target='ci_openshift'
 fi
 declare -A default_targets=(['kubernetes']="$k8s_target" ['openstack']='ci_sanity' ['hybrid']="ci_sanity,${k8s_target}")

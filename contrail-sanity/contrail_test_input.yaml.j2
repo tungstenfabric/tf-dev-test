@@ -159,6 +159,8 @@ deployment:
 {%- endif %}
 {%- if DEPLOYER == 'ansible' %}
     deployer: contrail-ansible-deployer
+{%- elif DEPLOYER == 'oepnshift3' %}
+    deployer: openshift
 {%- else %}
     deployer: {{ DEPLOYER }}
 {%- endif %}

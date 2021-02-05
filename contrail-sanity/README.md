@@ -11,7 +11,7 @@ SSH_USER - user to access remote nodes (current user by default)
 CONTAINER_REGISTRY - registry of images in cluster (opencontrailnightly, tungstenfabric, or your private registry)
 CONTRAIL_CONTAINER_TAG - tag of images in cluster (latest, master-latest, ...)
 TF_TEST_IMAGE - full id of contrail-test image if it's not equal to CONTAINER_REGISTRY, CONTRAIL_CONTAINER_TAG (registry, name, tag)
-TF_TEST_TARGET - one or several comma separated targets like ci_sanity, ci_k8s_sanity, ci_openshift
+TF_TEST_TARGET - one or several comma separated targets like ci_sanity, ci_k8s_sanity, ci_openshift(openshift 3.x)
 SSL_ENABLE - just true or false. Is SSL enabled in the deployment or not
 SSL_KEY, SSL_CERT, SSL_CACERT - paths to certs/keys
 DEPLOYER - how the setup was deployed. with ansible-deployer, helm-deployer, juju, rhosp, k8s_manifests, openshift
