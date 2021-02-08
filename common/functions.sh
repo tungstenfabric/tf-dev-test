@@ -64,7 +64,6 @@ function set_ssh_keys() {
 
 function install_prerequisites_centos() {
     local pkgs=""
-    which lsof || pkgs+=" lsof"
     which python3 || pkgs+=" python3"
     if [ -n "$pkgs" ] ; then
         sudo yum install -y $pkgs
@@ -77,7 +76,6 @@ function install_prerequisites_rhel() {
 
 function install_prerequisites_ubuntu() {
     local pkgs="python3-minimal python3-distutils"
-    which lsof || pkgs+=" lsof"
     export DEBIAN_FRONTEND=noninteractive
     retry sudo -E apt-get install -y $pkgs
 }
