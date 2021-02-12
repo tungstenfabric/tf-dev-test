@@ -52,7 +52,7 @@ TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.ya
 cd $WORKSPACE
 
 python3 -m pip --version || curl -s https://bootstrap.pypa.io/get-pip.py | sudo python3
-sudo python3 -m pip install jinja2 future
+sudo python3 -m pip install jinja2
 
 if echo ",${CONTROLLER_NODES},${AGENT_NODES}," | tr ' ' ','  | grep -q ",${NODE_IP}," ; then
     # prepare ssh keys for local connect
