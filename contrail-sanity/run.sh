@@ -84,10 +84,16 @@ if [[ ${TF_TEST_TARGET} == *"ci_k8s_sanity"* ]]; then
     #   to let tf-test to copy this config, load and parse let's copy it from worker to master
     KUBE_CONFIG="/tmp/kube_config"
     if [[ "$DEPLOYER" == 'juju' ]]; then
-        src_ip=$(echo $AGENT_NODES | awk '{print $1}')
+        echo "INFO: juju branch. copy from .kube/config from agent to first controller"
+        # in case of juju-hybrid we have agent on controllers so we have to choose pure agent for src node
+        # where .kube/config is present
+        for agent_node in $AGENT_NODES ; do
+            if scp $ssl_opts $SSH_USER@$agent_node:.kube/config $KUBE_CONFIG ; then
+                break
+            fi
+        done
         dst_ip=$(echo $CONTROLLER_NODES | awk '{print $1}')
-        echo "INFO: juju branch. copy from $src_ip/.kube/config to $dst_ip:$KUBE_CONFIG"
-        scp $ssl_opts $SSH_USER@$src_ip:.kube/config $KUBE_CONFIG
+        echo "INFO: juju branch. copy from $agent_node/.kube/config to $dst_ip:$KUBE_CONFIG"
         scp $KUBE_CONFIG $ssl_opts $SSH_USER@$dst_ip:$KUBE_CONFIG
     else
         config="/etc/kubernetes/admin.conf"
