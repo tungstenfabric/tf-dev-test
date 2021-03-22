@@ -1,22 +1,22 @@
-# Contrail sanity test for a TF deployment
+# TF sanity test for a TF deployment
 
-It runs the corresponding to the orchestrator test suit from [contrail-test](https://github.com/tungstenfabric/tf-test/tree/master) project.
+It runs the corresponding to the orchestrator test suit from [tf-test](https://github.com/tungstenfabric/tf-test/tree/master) project.
 
 # Environment parameters
 
 ORCHESTRATOR - can be one of 'openstack', 'kubernetes', 'hybrid'
 
-CONTROLLER_NODES - it’s a list of comma separated IP-s of control plane (contrail, openstack, kubernetes). for now tf-dev-test support only configurations where all components of control plane (contrail, openstack, kubernetes) are placed one same machines (for example "IP1,IP2,IP3")
+CONTROLLER_NODES - it’s a list of comma separated IP-s of control plane (tf, openstack, kubernetes). for now tf-dev-test support only configurations where all components of control plane (tf, openstack, kubernetes) are placed one same machines (for example "IP1,IP2,IP3")
 
 AGENT_NODES - it’s a list of comma separated IP-s of agent nodes (compute, kubernetes worker). Same comment is here - there is no possibility to specify different nodes for computes and kubernetes.
 
 SSH_USER - user to access remote nodes (current user by default)
 
-CONTAINER_REGISTRY - registry of images in cluster (opencontrailnightly, tungstenfabric, or your private registry)
+CONTAINER_REGISTRY - registry of images in cluster (tungstenfabric, or your private registry)
 
 CONTRAIL_CONTAINER_TAG - tag of images in cluster (latest, master-latest, ...)
 
-TF_TEST_IMAGE - full id of contrail-test image if it's not equal to CONTAINER_REGISTRY, CONTRAIL_CONTAINER_TAG (registry, name, tag)
+TF_TEST_IMAGE - full id of tf-test image if it's not equal to CONTAINER_REGISTRY, CONTRAIL_CONTAINER_TAG (registry, name, tag)
 
 TF_TEST_TARGET - one or several comma separated targets like ci_sanity, ci_k8s_sanity, ci_openshift(openshift 3.x)
 

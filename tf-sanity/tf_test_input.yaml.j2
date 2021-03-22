@@ -100,7 +100,7 @@ contrail_configuration:
      project: k8s-default
 {%- endif %}
 {%- if SSL_ENABLE == 'true' %}
-  # contrail-test check flag existense and doesn't check the value
+  # tf-test check flag existense and doesn't check the value
   SSL_ENABLE: "{{ SSL_ENABLE }}"
   RABBITMQ_USE_SSL: "{{ SSL_ENABLE }}"
   CASSANDRA_SSL_ENABLE: "{{ SSL_ENABLE }}"

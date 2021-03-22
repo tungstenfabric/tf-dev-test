@@ -47,7 +47,7 @@ if [[ -z "$TF_TEST_TARGET" ]]; then
     exit 1
 fi
 echo "INFO: test_target is $TF_TEST_TARGET"
-TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/contrail_test_input.yaml.j2"}
+TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/tf_test_input.yaml.j2"}
 
 cd $WORKSPACE
 
@@ -110,10 +110,10 @@ fi
 # run tests:
 
 echo "INFO: prepare input parameters from template $TF_TEST_INPUT_TEMPLATE"
-"$my_dir/../common/jinja2_render.py" < $TF_TEST_INPUT_TEMPLATE > ./contrail_test_input.yaml
+"$my_dir/../common/jinja2_render.py" < $TF_TEST_INPUT_TEMPLATE > ./tf_test_input.yaml
 
 echo "INFO: TF test input:"
-cat ./contrail_test_input.yaml
+cat ./tf_test_input.yaml
 
 ssl_opts=''
 if [[ "${SSL_ENABLE,,}" == 'true' ]] ; then
@@ -136,7 +136,7 @@ echo "INFO: run tests..."
 # NOTE: testrunner.sh always returns non-zero code even if it's SUCCESS...
 res=0
 if HOME=$WORKSPACE ./testrunner.sh run -H \
-    -P ./contrail_test_input.yaml \
+    -P ./tf_test_input.yaml \
     -k ~/.ssh/id_rsa \
     $ssl_opts \
     -T $TF_TEST_TARGET \

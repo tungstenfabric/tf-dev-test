@@ -53,7 +53,7 @@ function set_ssh_keys() {
         set_ssh_keys_current_user
     elif [[ "$user" == 'root' ]] ; then
         # set for root if current is not root
-        # contrail-test use root for now
+        # tf-test use root for now
         sudo bash -c "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"
     else
         sudo runuser -u $user "$(declare -f set_ssh_keys_current_user); set_ssh_keys_current_user"

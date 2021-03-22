@@ -4,14 +4,15 @@ tf-dev-test is a tool for testing of Tungsten Fabric deployments by means of var
 
 Supported test suites are:
 - [smoke](https://github.com/tungstenfabric/tf-dev-test/tree/master/smoke-test)
-- [contrail-sanity](https://github.com/tungstenfabric/tf-dev-test/tree/master/contrail-sanity)
+- [tf-sanity](https://github.com/tungstenfabric/tf-dev-test/tree/master/tf-sanity)
+- [deployment-test](https://github.com/tungstenfabric/tf-dev-test/tree/master/deployment-test)
 
 Generic interface consists of the following environment variables:
 - ORCHESTRATOR      - deployment orchestrator: kubernetes (default) or openstack
 - OPENSTACK_VERSION - version of OpenStack (default is queens, it is for OpenStack deployments only)
-- CONTROLLER_NODES  - list of Contrail Controller nodes (default is the current node - AIO installation)
+- CONTROLLER_NODES  - list of TF Controller nodes (default is the current node - AIO installation)
                       delimited with space or comma
-- AGENT_NODES       - list of Contrail Agent Controller nodes (default is the current node - AIO installation)
+- AGENT_NODES       - list of TF Agent Controller nodes (default is the current node - AIO installation)
                       delimited with space or comma
 - DOMAINSUFFIX      - domain name suffix (by default is detected from the current host)
 
