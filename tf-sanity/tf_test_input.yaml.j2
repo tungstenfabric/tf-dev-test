@@ -94,10 +94,10 @@ contrail_configuration:
 {%- endif %}
 {%- if ORCHESTRATOR == 'kubernetes' or ORCHESTRATOR == 'hybrid' %}
   KUBERNETES_PUBLIC_FIP_POOL:
-     domain: default-domain
+     domain: {{ KUBERNETES_CLUSTER_DOMAIN | default('default-domain') }}
      name: __fip_pool_public__
      network: __public__
-     project: k8s-default
+     project: {{ KUBERNETES_CLUSTER_PROJECT |  default('k8s-default') }}
 {%- endif %}
 {%- if SSL_ENABLE == 'true' %}
   # tf-test check flag existense and doesn't check the value
