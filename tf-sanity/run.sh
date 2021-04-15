@@ -15,6 +15,11 @@ export ssh_opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o 
 # RHOSP16's 'docker --> podman' symlink for overcloud nodes
 if [ "$RHEL_VERSION" == "rhel8" ] ; then
     for ip in $(echo "$CONTROLLER_NODES $AGENT_NODES $OPENSTACK_CONTROLLER_NODES" | sort -u) ; do
+        if [ -f /etc/yum.repos.d/local.repo ]; then
+            #distribute local mirrors to overcloud nodes
+            scp $ssh_opts /etc/yum.repos.d/local.repo $SSH_USER@$ip:
+            ssh $ssh_opts $SSH_USER@$ip "sudo cp local.repo /etc/yum.repos.d/"
+        fi
         ssh $ssh_opts $SSH_USER@$ip "sudo yum install -y podman-docker && sudo touch /etc/containers/nodocker"
     done
 fi
