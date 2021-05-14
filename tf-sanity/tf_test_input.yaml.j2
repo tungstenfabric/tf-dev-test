@@ -58,7 +58,7 @@ instances:
     provider: bms
     roles:
       vrouter:
-{%- if node in DPDK_AGENT_NODES %}
+{%- if DPDK_AGENT_NODES is defined and node in DPDK_AGENT_NODES %}
         AGENT_MODE: dpdk
 {%- endif %}
 {%- if ORCHESTRATOR == 'openstack' or ORCHESTRATOR == 'hybrid' %}
