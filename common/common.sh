@@ -40,4 +40,4 @@ export SSL_ENABLE=${SSL_ENABLE:-false}
 # Openstack defaults
 export OPENSTACK_VERSION=${OPENSTACK_VERSION:-"queens"}
 
-[[ "$DISTRO" != "rhel" ]] || export RHEL_VERSION="rhel$( cat /etc/redhat-release | egrep -o "[0-9]*\." | cut -d '.' -f1 )"
+[[ "$DISTRO" != "rhel" ]] || export RHEL_VERSION="rhel$(cat /etc/redhat-release | egrep -o "[0-9]*\.[0-9]*" | sed 's/\.//')"

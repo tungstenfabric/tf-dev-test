@@ -13,7 +13,7 @@ export SSH_USER=${SSH_USER:-$(whoami)}
 export ssh_opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no"
 
 # RHOSP16's 'docker --> podman' symlink for overcloud nodes
-if [ "$RHEL_VERSION" == "rhel8" ] ; then
+if [ "$RHEL_VERSION" =~ "rhel8" ] ; then
     for ip in $(echo "$CONTROLLER_NODES $AGENT_NODES $OPENSTACK_CONTROLLER_NODES" | sort -u) ; do
         if [ -f /etc/yum.repos.d/local.repo ]; then
             #distribute local mirrors to overcloud nodes

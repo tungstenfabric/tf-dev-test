@@ -37,7 +37,7 @@ function install_docker_centos() {
 }
 
 function install_docker_rhel() {
-    if [ "$RHEL_VERSION" != "rhel8" ]; then
+    if [ "$RHEL_VERSION" == "rhel7" ]; then
         yum install -y docker device-mapper-libs device-mapper-event-libs
     else
         yum install -y podman device-mapper-libs device-mapper-event-libs
@@ -99,7 +99,7 @@ echo "INFO: distro=$DISTRO detected"
 if ! which docker >/dev/null 2>&1 ; then
     [ "$DISTRO" == "ubuntu" ] || systemctl stop firewalld || true
     install_docker_$DISTRO
-    [ "$DISTRO" == "ubuntu" ] || [ "$RHEL_VERSION" == "rhel8" ] || systemctl start docker
+    [ "$DISTRO" == "ubuntu" ] || [ "$RHEL_VERSION" =~ "rhel8" ] || systemctl start docker
 else
   echo "INFO: docker installed: $(docker --version)"
 fi
@@ -119,7 +119,7 @@ if ! is_registry_insecure "$CONTAINER_REGISTRY"; then
 fi
 
 # finding out DOCKER_CONFIG file for insecure registries
-if [ "$RHEL_VERSION" == "rhel8" ]; then
+if [ "$RHEL_VERSION" =~ "rhel8" ]; then
     DOCKER_CONFIG="/etc/containers/registries.conf"
 else
     if [ -e "/etc/sysconfig/docker" ]; then
@@ -144,7 +144,7 @@ echo ""
 echo "INFO: [restart docker]"
 
 if [ x"$DISTRO" == x"centos" -o x"$DISTRO" == x"rhel" ] ; then
-    [[ "$RHEL_VERSION" == "rhel8" ]] || systemctl restart docker
+    [[ "$RHEL_VERSION" =~ "rhel8" ]] || systemctl restart docker
 elif [ x"$DISTRO" == x"ubuntu" ]; then
     service docker reload
 else
