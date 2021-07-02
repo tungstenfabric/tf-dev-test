@@ -99,7 +99,7 @@ echo "INFO: distro=$DISTRO detected"
 if ! which docker >/dev/null 2>&1 ; then
     [ "$DISTRO" == "ubuntu" ] || systemctl stop firewalld || true
     install_docker_$DISTRO
-    [ "$DISTRO" == "ubuntu" ] || [ "$RHEL_VERSION" =~ "rhel8" ] || systemctl start docker
+    [ "$DISTRO" == "ubuntu" ] || [[ "$RHEL_VERSION" =~ "rhel8" ]] || systemctl start docker
 else
   echo "INFO: docker installed: $(docker --version)"
 fi
