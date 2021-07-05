@@ -23,6 +23,21 @@ install_prerequisites_$DISTRO
 # prepare env
 sudo -E $my_dir/../common/setup_docker.sh
 
+# prepare ssl certs
+if [[ "${SSL_ENABLE,,}" == 'true' ]] ; then
+    echo "INFO: SSL enabled. prepare certs from env if exist"
+    sudo mkdir -p /etc/contrail/ssl/private /etc/contrail/ssl/certs
+    if [[ -n "$SSL_KEY" ]]; then
+        echo "$SSL_KEY" | base64 -d -w 0 | sudo tee /etc/contrail/ssl/private/server-privkey.pem > /dev/null
+    fi
+    if [[ -n "$SSL_CERT" ]]; then
+        echo "$SSL_CERT" | base64 -d -w 0 | sudo tee /etc/contrail/ssl/certs/server.pem > /dev/null
+    fi
+    if [[ -n "$SSL_CACERT" ]]; then
+        echo "$SSL_CACERT" | base64 -d -w 0 | sudo tee /etc/contrail/ssl/certs/ca-cert.pem > /dev/null
+    fi
+fi
+
 cd $WORKSPACE
 
 # get testrunner.sh project
