@@ -1,6 +1,6 @@
 # Smoke test for a TF deployment 
 
-Very basic test cases to quitckly check a deployment.
+Very basic test cases to quickly check a deployment.
 
 Note, for now only OpenStack deployments is supported.
 
