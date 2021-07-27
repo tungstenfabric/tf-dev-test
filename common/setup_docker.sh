@@ -19,13 +19,17 @@ function is_registry_insecure() {
 
 ### install_docker_DISTRO functions
 
+# this is the last project in queue tf-dev-env -> tf-devstack -> tf-dev-test
+# and if docker is not present on this machine then we are free to install any
+# version of docker which is availablel for current os-release
+
 function install_docker_ubuntu() {
     export DEBIAN_FRONTEND=noninteractive
     retry apt-get update
     retry apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
     add-apt-repository -y -u "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    retry apt-get install -y "docker-ce=18.06.3~ce~3-0~ubuntu"
+    retry apt-get install -y "docker-ce"
 }
 
 function install_docker_centos() {
@@ -33,7 +37,7 @@ function install_docker_centos() {
     if ! yum info docker-ce &> /dev/null ; then
         yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     fi
-    retry yum install -y docker-ce-18.03.1.ce
+    retry yum install -y docker-ce
 }
 
 function install_docker_rhel() {
