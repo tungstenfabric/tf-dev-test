@@ -66,11 +66,22 @@ fi
 
 # get testrunner.sh project
 echo "INFO: get testrunner.sh from image"
-sudo docker pull $TF_TEST_IMAGE
 tmp_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
-sudo docker create --name $tmp_name $TF_TEST_IMAGE
-sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
-sudo docker rm $tmp_name
+if which docker >/dev/null 2>&1 ; then
+    echo "INFO: docker installed: $(docker --version)"
+    sudo docker pull $TF_TEST_IMAGE
+    sudo docker create --name $tmp_name $TF_TEST_IMAGE
+    sudo docker cp $tmp_name:/contrail-test/testrunner.sh ./testrunner.sh
+    sudo docker rm $tmp_name
+elif which ctr >/dev/null 2>&1 ; then
+    echo "INFO: containerd installed: $(ctr --version)"
+    sudo ctr -n k8s.io image pull $TF_TEST_IMAGE
+    sudo ctr -n k8s.io container create $TF_TEST_IMAGE $tmp_name
+    mkdir /tmp/$tmp_name
+    sudo ctr -n k8s.io snapshot mounts /tmp/$tmp_name $tmp_name | xargs sudo
+    cp /tmp/$tmp_name/contrail-test/testrunner.sh ./testrunner.sh
+    sudo ctr -n k8s.io container rm $tmp_name
+fi
 
 # hack for tf-test container. it goes to the host over ftp and downloads /etc/kubernetes/admin.conf by default
 if [[ ${TF_TEST_TARGET} == *"ci_k8s_sanity"* ]]; then

@@ -100,17 +100,21 @@ echo ""
 echo 'INFO: [docker install]'
 echo "INFO: distro=$DISTRO detected"
 
-if ! which docker >/dev/null 2>&1 ; then
+if which docker >/dev/null 2>&1 ; then
+    echo "INFO: docker installed: $(docker --version)"
+elif which ctr >/dev/null 2>&1 ; then
+    echo "INFO: containerd installed: $(ctr --version)"
+    exit 0
+else
     [ "$DISTRO" == "ubuntu" ] || systemctl stop firewalld || true
     install_docker_$DISTRO
     [ "$DISTRO" == "ubuntu" ] || [[ "$RHEL_VERSION" =~ "rhel8" ]] || systemctl start docker
-else
-  echo "INFO: docker installed: $(docker --version)"
 fi
 
 echo
 echo '[docker config]'
 
+# TODO: config insecure registry for containerd
 # CONTAINER_REGISTRY's checks for definition and secureness
 if [ -z "${CONTAINER_REGISTRY}" ]; then
     echo "${CONTAINER_REGISTRY} is not defined."

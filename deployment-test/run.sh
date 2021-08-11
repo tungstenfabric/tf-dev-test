@@ -42,15 +42,28 @@ cd $WORKSPACE
 
 # get testrunner.sh project
 echo "INFO: get testrunner.sh from image"
-if ! sudo docker pull $TF_DEPLOYMENT_TEST_IMAGE ; then
-  echo "INFO: looks like deployment-test container was not built due to old release. Skipping tests..."
-  exit
-fi
-
 tmp_name=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
-sudo docker create --name $tmp_name $TF_DEPLOYMENT_TEST_IMAGE
-sudo docker cp $tmp_name:/testrunner.sh ./testrunner.sh
-sudo docker rm $tmp_name
+if which docker >/dev/null 2>&1 ; then
+    echo "INFO: docker installed: $(docker --version)"
+    if ! sudo docker pull $TF_DEPLOYMENT_TEST_IMAGE ; then
+        echo "INFO: looks like deployment-test container was not built due to old release. Skipping tests..."
+        exit
+    fi
+    sudo docker create --name $tmp_name $TF_DEPLOYMENT_TEST_IMAGE
+    sudo docker cp $tmp_name:/testrunner.sh ./testrunner.sh
+    sudo docker rm $tmp_name
+elif which ctr >/dev/null 2>&1 ; then
+    echo "INFO: containerd installed: $(ctr --version)"
+    if ! sudo ctr -n k8s.io image pull $TF_DEPLOYMENT_TEST_IMAGE ; then
+        echo "INFO: looks like deployment-test container was not built due to old release. Skipping tests..."
+        exit
+    fi
+    sudo ctr -n k8s.io container create $TF_DEPLOYMENT_TEST_IMAGE $tmp_name
+    mkdir /tmp/$tmp_name
+    sudo ctr -n k8s.io snapshot mounts /tmp/$tmp_name $tmp_name | xargs sudo
+    cp /tmp/$tmp_name/testrunner.sh ./testrunner.sh
+    sudo ctr -n k8s.io container rm $tmp_name
+fi
 
 # run tests
 echo "INFO: run tests..."
