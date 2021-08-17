@@ -75,7 +75,10 @@ if which docker >/dev/null 2>&1 ; then
     sudo docker rm $tmp_name
 elif which ctr >/dev/null 2>&1 ; then
     echo "INFO: containerd installed: $(ctr --version)"
-    sudo ctr -n k8s.io image pull $TF_TEST_IMAGE
+    if ! sudo ctr -n k8s.io image pull $TF_TEST_IMAGE >/dev/null ; then
+        echo "ERROR: image $TF_TEST_IMAGE cannot be pulled"
+        exit 1
+    fi
     sudo ctr -n k8s.io container create $TF_TEST_IMAGE $tmp_name
     mkdir /tmp/$tmp_name
     sudo ctr -n k8s.io snapshot mounts /tmp/$tmp_name $tmp_name | xargs sudo

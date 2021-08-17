@@ -54,7 +54,7 @@ if which docker >/dev/null 2>&1 ; then
     sudo docker rm $tmp_name
 elif which ctr >/dev/null 2>&1 ; then
     echo "INFO: containerd installed: $(ctr --version)"
-    if ! sudo ctr -n k8s.io image pull $TF_DEPLOYMENT_TEST_IMAGE ; then
+    if ! sudo ctr -n k8s.io image pull $TF_DEPLOYMENT_TEST_IMAGE >/dev/null ; then
         echo "INFO: looks like deployment-test container was not built due to old release. Skipping tests..."
         exit
     fi
