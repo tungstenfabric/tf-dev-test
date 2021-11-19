@@ -2,6 +2,10 @@
 set -o errexit
 my_file="$(readlink -e "$0")"
 my_dir="$(dirname $my_file)"
+
+if [ -f ~/overcloudrc ] ; then
+  source ~/overcloudrc
+fi
 source "$my_dir/../common/openrc"
 
 TEST_SUBNET_CIDR="${TEST_SUBNET_CIDR:-172.23.0.0/24}"

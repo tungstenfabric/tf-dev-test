@@ -7,26 +7,28 @@ source "$my_dir/../common/functions.sh"
 
 pushd $WORKSPACE
 
-echo 
+echo
 echo "[$TF_TEST_NAME]"
 
 # TODO: to be implemented
 
-printf '%*s\n' 120 | tr ' ' '='
-sudo contrail-status
-printf '%*s\n' 120 | tr ' ' '='
-if which docker >/dev/null 2>&1 ; then
-  sudo docker ps -a
+if [[ "$DEPLOYER" != 'rhosp' ]] ; then
   printf '%*s\n' 120 | tr ' ' '='
-  sudo docker images
-elif which ctr >/dev/null 2>&1 ; then
-  sudo ctr -n k8s.io containers ls
+  sudo contrail-status
   printf '%*s\n' 120 | tr ' ' '='
-  sudo ctr -n k8s.io images ls
+  if which docker >/dev/null 2>&1 ; then
+    sudo docker ps -a
+    printf '%*s\n' 120 | tr ' ' '='
+    sudo docker images
+  elif which ctr >/dev/null 2>&1 ; then
+    sudo ctr -n k8s.io containers ls
+    printf '%*s\n' 120 | tr ' ' '='
+    sudo ctr -n k8s.io images ls
+  fi
+  printf '%*s\n' 120 | tr ' ' '*'
+  ps ax -H
+  printf '%*s\n' 120 | tr ' ' '*'
 fi
-printf '%*s\n' 120 | tr ' ' '*'
-ps ax -H
-printf '%*s\n' 120 | tr ' ' '*'
 
 if [[ "$ORCHESTRATOR" == "openstack" ]]; then
   ${my_dir}/test_openstack_vm.sh
