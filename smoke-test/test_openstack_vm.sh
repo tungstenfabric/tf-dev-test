@@ -16,6 +16,8 @@ OVERCLOUD_TLS_OPTS=${OVERCLOUD_TLS_OPTS:-}
 
 SSH_OPTIONS="-T -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
+[ -z "$SSH_USER" ] || SSH_OPTIONS+=" -l $SSH_USER"
+
 TEST_INSTANCE_NAME=tf-devstack-testvm
 function cleanup() {
   openstack server delete tf-devstack-testvm --wait || :
