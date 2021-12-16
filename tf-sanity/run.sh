@@ -20,7 +20,7 @@ if [[ "$RHEL_VERSION" =~ "rhel8" ]] ; then
             scp $ssh_opts /etc/yum.repos.d/local.repo $SSH_USER@$ip:
             ssh $ssh_opts $SSH_USER@$ip "sudo cp local.repo /etc/yum.repos.d/"
         fi
-        ssh $ssh_opts $SSH_USER@$ip "sudo yum install -y podman-docker && sudo touch /etc/containers/nodocker"
+        ssh $ssh_opts $SSH_USER@$ip "which docker || ( sudo yum install -y podman-docker && sudo touch /etc/containers/nodocker )"
     done
 fi
 #

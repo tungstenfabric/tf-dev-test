@@ -65,23 +65,28 @@ instance_ip=$(openstack server show $TEST_INSTANCE_NAME | awk '/addresses/{print
 	
 # on the hypervisor where instance run
 if_name=$(ssh $SSH_OPTIONS $first_hypervisor_ip sudo vif --list | grep -B 1 $instance_ip | head -1 | awk '{print $3}' | sed 's/\r//g')
-ssh $SSH_OPTIONS $first_hypervisor_ip curl -s "http://$first_hypervisor_ip:8085/Snh_ItfReq?name=$if_name"
-linklocal_ip=$(ssh $SSH_OPTIONS $first_hypervisor_ip curl -s "http://$first_hypervisor_ip:8085/Snh_ItfReq?name=$if_name" | sed 's/^.*<mdata_ip_addr.*>\([0-9\.]*\)<.mdata_ip_addr>.*$/\1/')
 
-res=1
-msg="ERROR: failed to execute ssh $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip"
-for i in {1..5} ; do
-  if ssh $SSH_OPTIONS $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip ; then
-    msg="INFO: suceeded ssh $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip"
-    res=0
-    break
-  fi
-done
-echo $msg
+if [[ "${SSL_ENABLE,,}" != 'true' ]] ; then
+  ssh $SSH_OPTIONS $first_hypervisor_ip curl -s "http://$first_hypervisor_ip:8085/Snh_ItfReq?name=$if_name"
+  linklocal_ip=$(ssh $SSH_OPTIONS $first_hypervisor_ip curl -s "http://$first_hypervisor_ip:8085/Snh_ItfReq?name=$if_name" | sed 's/^.*<mdata_ip_addr.*>\([0-9\.]*\)<.mdata_ip_addr>.*$/\1/')
+
+  res=1
+  msg="ERROR: failed to execute ssh $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip"
+  for i in {1..5} ; do
+    if ssh $SSH_OPTIONS $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip ; then
+      msg="INFO: suceeded ssh $first_hypervisor_ip ping -c1 -w 5 $linklocal_ip"
+      res=0
+      break
+    fi
+  done
+  echo $msg
+else
+  echo "TODO: skipped linklocal test for SSL - not implemented"
+fi
 
 # Enable after metadata is working
 #ssh $SSH_OPTIONS $first_hypervisor_ip sudo yum install -y sshpass || ssh $first_hypervisor_ip sudo apt-get install sshpass
-#ssh $SSH_OPTIONS $first_hypervisor_ip sshpass -p 'cubswin:)'  ssh cirros@$linklocal_ip curl --connect-timeout 5 http://169.254.169.254/2009-04-04/instance-id
+#ssh $SSH_OPTIONS $first_hypervisor_ip sshpass -p 'cubswin:)'  ssh cirros@$linklocal_ip curl --connect-timeout 5 http://169.254.169.254/2009-04-04/meta-data/instance-id
 # Tear down
 cleanup
 
