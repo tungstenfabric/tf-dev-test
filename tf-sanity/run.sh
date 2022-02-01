@@ -56,7 +56,7 @@ TF_TEST_INPUT_TEMPLATE=${TF_TEST_INPUT_TEMPLATE:-"$my_dir/tf_test_input.yaml.j2"
 
 cd $WORKSPACE
 
-python3 -m pip --version || curl -s https://bootstrap.pypa.io/pip/get-pip.py | sudo python3
+python3 -m pip --version || curl -s https://bootstrap.pypa.io/pip/3.6/get-pip.py | sudo python3
 sudo python3 -m pip install jinja2
 
 if echo ",${CONTROLLER_NODES},${AGENT_NODES}," | tr ' ' ','  | grep -q ",${NODE_IP}," ; then
