@@ -186,9 +186,10 @@ test_configuration:
     test_domain: {{ AUTH_DOMAIN }}
 {%- endif %}
 {%- endif %}
+    container_runtime: {{ CONTAINER_RUNTIME }}
+
 {%- if SRIOV_CONFIGURATION is defined and SRIOV_CONFIGURATION|length %}
 {%- set SRIOV_CONFIGURATION_ITEMS = SRIOV_CONFIGURATION.split(';') %}
-
 #Special data-structure for tf-test/serial/sriov/*
 sriov_configuration:
 {%- for item in SRIOV_CONFIGURATION_ITEMS %}
@@ -199,4 +200,3 @@ sriov_configuration:
       VF: {{ vf }}
 {%- endfor %}
 {%- endif -%}
-
