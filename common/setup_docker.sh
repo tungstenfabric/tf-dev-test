@@ -127,7 +127,8 @@ if ! is_registry_insecure "$CONTAINER_REGISTRY"; then
 fi
 
 # finding out DOCKER_CONFIG file for insecure registries
-if [[ "$RHEL_VERSION" =~ "rhel8" ]]; then
+#RHEL8 and podman case
+if [[ "$RHEL_VERSION" =~ "rhel8" ]] && [ -e "/etc/containers/registries.conf" ]; then
     DOCKER_CONFIG="/etc/containers/registries.conf"
 else
     if [ -e "/etc/sysconfig/docker" ]; then
