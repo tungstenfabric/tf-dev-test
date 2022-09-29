@@ -52,12 +52,36 @@ function install_docker_rhel() {
 
 ### configure_insecure_registries_[/etc directory]
 
-function configure_insecure_registries_containers() {
+function configure_insecure_registries_containers_v1() {
+    local new_registry=$1
     local insecure_registries="$(sed -n '/registries.insecure/{n; s/registries = //p}' "$DOCKER_CONFIG" | tr -d '[]')"
+    echo "INFO: Adding new registry $new_registry v1"
     echo "INFO: old registries are $insecure_registries"
-    insecure_registries="registries =[$insecure_registries, '$1']"
+    insecure_registries="registries =[$insecure_registries, '$new_registry']"
     echo "INFO: new registries are $insecure_registries"
     sed -i "/registries.insecure/{n; s/registries = .*$/${insecure_registries}/g}" ${DOCKER_CONFIG}
+}
+
+function configure_insecure_registries_containers_v2() {
+    local new_registry=$1
+    echo "INFO: Adding new registry $new_registry v2"
+    echo "[[registry]]" >> ${DOCKER_CONFIG}
+    echo "prefix = \"$new_registry\"" >> ${DOCKER_CONFIG}
+    echo "insecure = true" >> ${DOCKER_CONFIG}
+    echo "location = \"$new_registry\"" >> ${DOCKER_CONFIG}
+}
+
+function configure_insecure_registries_containers() {
+   if grep -q 'registries.insecure' ${DOCKER_CONFIG}; then
+       echo "INFO: podman config ${DOCKER_CONFIG} v1 detected"
+       configure_insecure_registries_containers_v1 $1
+   elif grep -q '\[\[registry\]\]' ${DOCKER_CONFIG}; then
+       echo "INFO: podman config ${DOCKER_CONFIG} v2 detected"
+       configure_insecure_registries_containers_v2 $1
+   else
+       "INFO: podman config ${DOCKER_CONFIG} version not detected. Using v1"
+       configure_insecure_registries_containers_v1 $1
+   fi
 }
 
 function configure_insecure_registries_sysconfig() {
