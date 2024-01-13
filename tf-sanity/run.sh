@@ -8,7 +8,7 @@ source "$my_dir/../common/functions.sh"
 rm -f $WORKSPACE/logs.tgz || /bin/true
 
 export DOMAINSUFFIX=${DOMAINSUFFIX-$(hostname -d)}
-export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"tf-nexus.progmaticlab.com/repository/"}
+export IMAGE_WEB_SERVER=${IMAGE_WEB_SERVER-"nexus.opensdn.io/repository/"}
 export SSH_USER=${SSH_USER:-$(whoami)}
 export ssh_opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no"
 
